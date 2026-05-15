@@ -316,31 +316,43 @@ GOOD: packages/auth/ — JWT authentication, role-based access control
 Before outputting the HTML, verify:
 
 - [ ] All `<pre>` blocks have copy buttons?
-- [ ] Theme toggle present (fixed, bottom-right)?
-- [ ] Section glow CSS included for h2 headings?
+- [ ] Theme toggle: SVG icons (NOT emoji), fixed bottom-right?
+- [ ] Section glow CSS and JS included for h2 headings?
 - [ ] Sidebar navigation present (if 4+ sections)?
 - [ ] Sidebar uses `getBoundingClientRect` + bottom detection?
 - [ ] Click handler uses `preventDefault` + `scrollIntoView`?
+- [ ] No `#fff` or `#000` used anywhere? (use token values instead)
+- [ ] No hardcoded colors outside the token set?
+- [ ] Dark mode uses `html.dark-mode` class? (NEVER data-theme attribute)
+- [ ] h2 elements are borderless?
 - [ ] No section is empty or shows "No data"?
 - [ ] Directory annotations are specific and accurate?
 - [ ] Coverage report shows actual scan stats?
-- [ ] Both light and dark mode work?
 - [ ] Responsive: sidebar hides on mobile?
 - [ ] Print styles hide sidebar + toggle + copy buttons?
+- [ ] `<html lang="xx">` matches output language?
 
 ---
 
 ## 3. Design Integration
 
-All output MUST follow `html.md` design system:
+All output MUST follow `html.md` design system. Use the exact token values:
 
-- Warm paper/ink palette, taupe accent
-- Serif h1/h2, sans-serif body, 1.25x type scale
-- 4px spacing grid
-- Cards, badges, tables, metric grid from html.md
-- Theme toggle, copy buttons on every `<pre>`, section glow on h2
-- Sidebar: sticky, 4+ sections threshold, active indicator, `getBoundingClientRect` + bottom detection
-- Anti-slop rules enforced (see html.md Section 7)
+Light mode tokens (MUST use these exact values, not hardcoded):
+- `--bg-page: #FAF8F5` (NOT #ffffff)
+- `--bg-card-solid: #F7F5F0` (NOT #ffffff)
+- `--accent: #8B7B68` (warm taupe, NOT brown, NOT orange)
+- `--text-heading: #1A1A1A` (NOT #000000)
+- `--shadow-sm: 0 1px 2px rgba(0,0,0,0.04)`
+
+Typography: Noto Serif SC (h1/h2, weight 500) + Noto Sans SC / Inter (body, weight 400). 1.25x type scale. h2 MUST be borderless.
+
+Interactive components (EVERY output MUST have ALL of these):
+- Theme toggle: SVG moon/sun icons (NEVER emoji), fixed bottom-right, `html.dark-mode` class (NEVER data-theme)
+- Copy buttons on every `<pre>` block
+- Section glow on h2 headings
+- Sidebar: sticky, 4+ sections, active indicator, scroll-based detection
+- Anti-slop: no #fff, no #000, no gradients, no emoji icons (see html.md Section 7)
 
 ### html-map Specific CSS
 

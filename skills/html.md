@@ -206,7 +206,7 @@ Rules:
 - NEVER: Use more than 2 font families (heading + body) in text. Mono is only for code.
 - NEVER: Use serif fonts below 20px. They lose legibility at small sizes.
 - NEVER: Center-align body text.
-- NEVER: Use bottom borders on h2 for section separation. Use margin-top (>= 3rem) instead.
+- NEVER: Use bottom borders on h2 for section separation. Use margin-top (>= 3rem) instead. h2 is always borderless.
 
 ---
 
@@ -354,7 +354,7 @@ Key: Large metric numbers, color-coded status (success/warning/danger).
 </nav>
 ```
 
-Sidebar rules:
+Sidebar rules (EVERY output MUST have a sidebar):
 
 - MUST be sticky (position: sticky; top: 3rem).
 - Active section MUST have a 3px rounded accent indicator on the left (::before pseudo-element).
@@ -408,7 +408,7 @@ Every HTML file MUST include a dark/light mode toggle button:
 - Behavior: toggle a class on `<html>` (`dark-mode` / `light-mode`), persist in `localStorage`
 - Default: honor system `prefers-color-scheme` if no stored preference
 
-Dark mode MUST be class-based, not media-query-only:
+Dark mode MUST be class-based on `<html>`. NEVER use `data-theme` attribute.
 
 ```css
 html.dark-mode { /* dark tokens */ }
@@ -475,10 +475,10 @@ Simple linear flows → CSS flexbox + styled step boxes + arrow characters. Comp
 
 ### NEVER
 
-- Pure white backgrounds (#ffffff, #fff)
-- Pure black text or backgrounds (#000000, #000)
+- Pure white backgrounds (#ffffff, #fff) — in ANY context including dark mode, card backgrounds, hover states
+- Pure black text or backgrounds (#000000, #000) — in ANY context
 - Background gradients on any element
-- Emoji as icons or decorative elements
+- Emoji as icons or decorative elements — including theme toggle buttons (MUST use SVG moon/sun icons, NEVER emoji)
 - High-saturation colors (neon green, electric blue, hot pink)
 - Glow, neon, or luminescence effects
 - Background images (unless the content specifically requires them)
@@ -590,15 +590,17 @@ When generating an HTML document:
    - prefers-color-scheme dark mode (@media (prefers-color-scheme: dark))
 
 6. **Verify before output.**
-   - [ ] No color value outside the token set?
-   - [ ] Both light and dark mode defined?
+   - [ ] No color value outside the token set? (No hardcoded #fff, #000, or custom hex anywhere)
+   - [ ] Both light and dark mode defined using `html.dark-mode` class? (NEVER data-theme)
    - [ ] Body line-height >= 1.65?
    - [ ] Max line width <= 780px?
    - [ ] All `<pre>` blocks have copy button?
-   - [ ] Theme toggle present (fixed, bottom-right)?
-   - [ ] Sidebar: h2 only, sticky, active indicator?
+   - [ ] Theme toggle: SVG icons (moon/sun), NOT emoji? Fixed bottom-right?
+   - [ ] Sidebar present? h2 only, sticky, active indicator, scroll detection?
+   - [ ] h2 elements are borderless? (NEVER bottom borders on h2)
    - [ ] Cards wrapped consistently (supplementary → card, core → standalone)?
-   - [ ] Section glow CSS included?
-   - [ ] Print styles + prefers-reduced-motion included?
+   - [ ] Section glow CSS and JS included?
+   - [ ] Print styles hide sidebar + toggle + copy buttons?
    - [ ] `<html lang="xx">` matches output language?
    - [ ] Script-based typography rules applied (CJK/Latin/RTL)?
+   - [ ] Google Fonts link includes fonts for the detected script?
