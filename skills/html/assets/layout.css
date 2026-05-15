@@ -1,0 +1,36 @@
+/* ============================================
+   craftHTML Layout — Sidebar + Main
+   Copy this block for the page structure
+   ============================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 3rem; }
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.layout { display: flex; max-width: 1100px; margin: 0 auto; padding: var(--space-12) var(--space-12) var(--space-12) var(--space-8); gap: 0; }
+.main { flex: 1; max-width: 780px; min-width: 0; padding-left: var(--space-12); }
+
+/* Sidebar */
+.sidebar { position: sticky; top: 3rem; width: 240px; flex-shrink: 0; max-height: calc(100vh - 6rem); overflow-y: auto; padding: var(--space-8) var(--space-8) var(--space-8) 0; font-size: 0.875rem; line-height: 1.5; }
+.sidebar::-webkit-scrollbar { width: 0; display: none; }
+.sidebar-title { font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 1.25rem; padding-left: 0.875rem; }
+.sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.sidebar a { display: block; padding: 0.4375rem 0.875rem; color: var(--text-secondary); text-decoration: none; border-radius: var(--radius-sm); transition: color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out); position: relative; }
+.sidebar a:hover { color: var(--text-primary); background: var(--accent-subtle); }
+.sidebar a.active { color: var(--text-heading); font-weight: 500; background: var(--accent-subtle); }
+.sidebar a.active::before { content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 16px; background: var(--accent); border-radius: var(--radius-pill); }
+
+/* Responsive */
+@media (max-width: 1024px) { .sidebar { display: none; } .layout { padding: var(--space-8) var(--space-4); } .main { padding-left: 0; } }
+@media (max-width: 768px) { html { font-size: 15px; } .layout { padding: 1.5rem 1.25rem; } }

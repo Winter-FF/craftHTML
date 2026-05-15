@@ -26,39 +26,57 @@
 
 ## 快速开始
 
-### 安装
-
-**方式一 — 一行命令（推荐）：**
+### 一行安装（全平台通用）
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/install.sh | bash
+npx skills add Winter-FF/craftHTML
 ```
 
-**方式二 — 全局安装（所有项目可用）：**
+自动检测已安装的 AI 工具（Claude Code、Codex、Cursor、Copilot、Gemini CLI 等），安装 `/html` 和 `/html-map` 两个技能。
 
-```bash
-curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/install.sh | bash -s -- --global
-```
+### 平台专属用法
 
-**方式三 — 手动安装：**
-
-```bash
-mkdir -p .claude/commands
-curl -sSfO https://raw.githubusercontent.com/Winter-FF/craftHTML/main/skills/html.md
-curl -sSfO https://raw.githubusercontent.com/Winter-FF/craftHTML/main/skills/html-map.md
-mv html.md html-map.md .claude/commands/
-```
-
-### 使用
-
-安装后重启 Claude Code，然后：
+**Claude Code：**
 
 ```
 /html document.md               → 转换为 HTML
 /html-map                       → 可视化当前项目
 ```
 
-就这样。无需配置，无需安装依赖。
+**Codex（OpenAI）：**
+
+```
+$html document.md        → 转换为 HTML
+$html-map                → 可视化当前项目
+```
+
+**其他工具（Cursor、Windsurf 等）：**
+
+设计系统模块是独立的 CSS/HTML/JS 文件，在项目规则中引用即可。见下方 [其他 AI 工具](#其他-ai-工具)。
+
+### 备选方案：install.sh
+
+```bash
+# 项目级
+curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/install.sh | bash
+
+# 全局
+curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/install.sh | bash -s -- --global
+```
+
+### 其他 AI 工具
+
+设计系统模块（`skills/html/assets/`）是独立的 CSS/HTML/JS 文件，可在任何工具中使用：
+
+**Cursor / Windsurf / VS Code Copilot：**
+
+将 `skills/html/SKILL.md` 的内容粘贴到项目的规则文件中（如 `.cursorrules`、`.windsurfrules`），然后在指令中引用 `skills/html/assets/` 中的 CSS 文件。
+
+**任何可访问文件的 Agent：**
+
+告诉 Agent：*"读取 `skills/html/assets/` 中的文件，将它们作为设计系统使用。遵循 `skills/html/SKILL.md` 中的规则。"*
+
+> **说明：** `/html` 和 `/html-map` 斜杠命令是 Claude Code 的自定义命令。其他工具使用相同的设计系统，但调用方式可能不同（作为项目规则、上下文文件或内联指令）。
 
 ## 功能展示
 
@@ -116,20 +134,22 @@ mv html.md html-map.md .claude/commands/
 ```
 craftHTML/
 ├── skills/
-│   ├── html.md          ← /html（文档转换）
-│   └── html-map.md      ← /html-map（项目全景地图）
-├── README.md            ← 英文文档
-├── README.zh.md         ← 本文件
+│   ├── html/                ← /html 技能（SKILL.md + assets/）
+│   └── html-map/            ← /html-map 技能（SKILL.md + assets/）
+├── scripts/
+│   └── install.sh           ← 备选安装脚本
+├── README.md
+├── README.zh.md             ← 本文件
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
-├── install.sh           ← 一键安装脚本
-└── examples/            ← Before / After 示例
+├── LICENSE
+└── assets/logo.png
 ```
 
 ## 卸载
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/install.sh | bash -s -- --uninstall
+curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/install.sh | bash -s -- --uninstall
 ```
 
 或手动删除 `.claude/commands/html.md` 和 `.claude/commands/html-map.md`。

@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **`/html`** core skill (`skills/html.md`): single-file design system for publication-quality HTML output
+- **`/html`** core skill (`skills/html/SKILL.md` + `assets/`): modular design system for publication-quality HTML output
   - Warm paper/ink color palette (Solarized-inspired, taupe accent)
   - Serif/sans-serif mixed typography (1.25x type scale)
   - 4px spacing grid
@@ -16,11 +16,13 @@ All notable changes to this project will be documented in this file.
   - Script-aware language support (CJK, Latin, RTL, Cyrillic)
   - Input routing: generate, translate, adjust modes
 
-- **`/html-map`** extension skill (`skills/html-map.md`): project visualization
+- **`/html-map`** extension skill (`skills/html-map/SKILL.md` + `assets/`): project visualization
   - Three-phase scanning (inventory → module snapshot → deep analysis)
   - 15 output sections across 6 understanding levels
   - Graceful degradation for missing data
   - Language-aware output (--lang flag)
+
+- **Multi-platform support**: agentskills.io standard — works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, etc.
 
 - **Examples**
   - Spec: before/after pair demonstrating /html conversion
@@ -31,4 +33,5 @@ All notable changes to this project will be documented in this file.
   - Apache 2.0 License
   - Contributing guide
   - .gitignore
-  - install.sh: one-click installer (project-level, global, uninstall)
+  - install.sh: universal installer (Claude Code + Codex)
+  - `npx skills add Winter-FF/craftHTML` support (agentskills.io standard)

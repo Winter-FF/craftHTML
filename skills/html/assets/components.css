@@ -1,0 +1,46 @@
+/* ============================================
+   craftHTML Components
+   Cards, Badges, Tables, Metrics, Collapsible
+   ============================================ */
+
+/* Cards */
+.card { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem 2rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-sm); transition: box-shadow var(--duration-normal) var(--ease-out); }
+.card:hover { box-shadow: var(--shadow-md); }
+.card-accent { border-left: 3px solid var(--accent); }
+.card h3, .card h4 { margin-top: 0; margin-bottom: 0.75rem; }
+
+/* Badges */
+.badge { display: inline-block; padding: 0.2em 0.7em; font-size: 0.75rem; font-weight: 500; border-radius: var(--radius-pill); text-transform: uppercase; vertical-align: middle; transition: background var(--duration-fast) var(--ease-out); }
+.badge-accent { color: var(--accent); background: var(--accent-subtle); }
+.badge-success { color: var(--success); background: var(--success-subtle); }
+.badge-warning { color: var(--warning); background: var(--warning-subtle); }
+.badge-danger { color: var(--danger); background: var(--danger-subtle); }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-bottom: var(--space-8); }
+th { font-weight: 500; text-align: left; padding: 0.625rem 0; border-bottom: 1px solid var(--border); color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; }
+td { padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+tr > * + * { padding-left: 1.25rem; }
+tr:hover td { color: var(--text-heading); }
+
+/* Metric Grid */
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+.metric-card { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.5rem 1.25rem; text-align: center; box-shadow: var(--shadow-sm); transition: box-shadow var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out); }
+.metric-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.metric-label { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin-bottom: 0.5rem; }
+.metric-value { font-family: var(--font-heading); font-size: 2.25rem; font-weight: 500; color: var(--text-heading); line-height: 1.1; letter-spacing: -0.02em; }
+.metric-unit { font-size: 0.75rem; color: var(--text-secondary); font-weight: 400; }
+
+/* Collapsible */
+details { border: 1px solid var(--border-subtle); border-radius: var(--radius-md); margin-bottom: 0.75rem; background: var(--bg-card-solid); box-shadow: var(--shadow-sm); overflow: hidden; transition: box-shadow var(--duration-normal) var(--ease-out); }
+details:hover { box-shadow: var(--shadow-md); }
+details[open] { padding-bottom: 0.5rem; }
+summary { padding: 0.875rem 1.25rem; font-weight: 500; font-size: 0.875rem; color: var(--text-heading); cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 0.75rem; transition: color var(--duration-fast) var(--ease-out); }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: ""; display: inline-block; width: 0; height: 0; border-left: 4.5px solid var(--text-muted); border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; flex-shrink: 0; transition: transform var(--duration-normal) var(--ease-out); }
+details[open] > summary::before { transform: rotate(90deg); }
+summary:hover { color: var(--accent); }
+summary:hover::before { border-left-color: var(--accent); }
+details .detail-content { padding: 0 1.25rem 0.25rem; }
+
+@media (max-width: 768px) { .metric-grid { grid-template-columns: 1fr 1fr; } .card { padding: 1.25rem; } }

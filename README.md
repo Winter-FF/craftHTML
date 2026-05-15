@@ -26,39 +26,57 @@
 
 ## Quick Start
 
-### Install
-
-**Option A — One command (recommended):**
+### One-liner install (all platforms)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/install.sh | bash
+npx skills add Winter-FF/craftHTML
 ```
 
-**Option B — Global install (all projects):**
+This installs both `/html` and `/html-map` for any detected AI tool (Claude Code, Codex, Cursor, Copilot, Gemini CLI, etc.).
 
-```bash
-curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/install.sh | bash -s -- --global
-```
+### Platform-specific
 
-**Option C — Manual:**
-
-```bash
-mkdir -p .claude/commands
-curl -sSfO https://raw.githubusercontent.com/Winter-FF/craftHTML/main/skills/html.md
-curl -sSfO https://raw.githubusercontent.com/Winter-FF/craftHTML/main/skills/html-map.md
-mv html.md html-map.md .claude/commands/
-```
-
-### Use
-
-After install, restart Claude Code. Then:
+**Claude Code:**
 
 ```
 /html document.md               → convert to HTML
 /html-map                       → visualize current project
 ```
 
-That's it. No config, no dependencies.
+**Codex (OpenAI):**
+
+```
+$html document.md        → convert to HTML
+$html-map                → visualize current project
+```
+
+**Other tools (Cursor, Windsurf, etc.):**
+
+The design system modules are standalone CSS/HTML/JS — reference them in your project rules. See [Other AI Tools](#other-ai-tools) below.
+
+### Fallback: install.sh
+
+```bash
+# Project-level
+curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/install.sh | bash
+
+# Global
+curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/install.sh | bash -s -- --global
+```
+
+### Other AI Tools
+
+The design system modules (`skills/html/assets/`) are standalone CSS/HTML/JS — they work anywhere. For tools that support custom instructions or rules:
+
+**Cursor / Windsurf / VS Code Copilot:**
+
+Paste the contents of `skills/html/SKILL.md` into your project's rules file (e.g., `.cursorrules`, `.windsurfrules`), then reference the asset CSS files from your instructions.
+
+**Any agent with file access:**
+
+Tell the agent: *"Read `skills/html/assets/` and use them as your design system when generating HTML. Follow the rules in `skills/html/SKILL.md`."*
+
+> **Note:** The `/html` and `/html-map` slash commands are Claude Code custom commands. Other tools use the same design system but invoke it differently (as project rules, context files, or inline instructions).
 
 ## Showcase
 
@@ -116,20 +134,22 @@ Every document deserves to be presented with care.
 ```
 craftHTML/
 ├── skills/
-│   ├── html.md          ← /html (document conversion)
-│   └── html-map.md      ← /html-map (project visual map)
-├── README.md            ← This file
-├── README.zh.md         ← Chinese documentation
+│   ├── html/                ← /html skill (SKILL.md + assets/)
+│   └── html-map/            ← /html-map skill (SKILL.md + assets/)
+├── scripts/
+│   └── install.sh           ← Fallback installer
+├── README.md
+├── README.zh.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
-├── install.sh           ← One-click installer
-└── examples/            ← Before / After examples
+├── LICENSE
+└── assets/logo.png
 ```
 
 ## Uninstall
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/install.sh | bash -s -- --uninstall
+curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/install.sh | bash -s -- --uninstall
 ```
 
 Or manually delete `.claude/commands/html.md` and `.claude/commands/html-map.md`.
