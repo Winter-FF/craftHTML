@@ -144,16 +144,51 @@ Technical terms (package names, file paths) ALWAYS remain in original.
 
 ## 6. Design Integration
 
-MUST use exact token values from `skills/html/assets/tokens.css`:
-- `--bg-page: #FAF8F5` (NOT #ffffff)
-- `--bg-card-solid: #F7F5F0` (NOT #ffffff)
-- `--accent: #8B7B68` (warm taupe, NOT blue/teal)
-- Theme toggle: SVG moon/sun (NEVER emoji), `html.dark-mode` class (NEVER data-theme)
-- Copy buttons on every `<pre>`
-- Section glow on h2
-- Sidebar: sticky, 4+ sections, active indicator, scroll detection
+**MUST copy ALL component CSS from `skills/html/assets/` — do NOT re-implement or create your own versions.**
 
-### html-map Specific CSS
+The /html-map output must look identical to /html output. Read these files and copy their contents exactly:
+
+1. `skills/html/assets/tokens.css` — ALL color/spacing/shadow/radius tokens
+2. `skills/html/assets/layout.css` — sidebar + main layout
+3. `skills/html/assets/typography.css` — ALL heading styles, paragraph styles, code styles
+4. `skills/html/assets/components.css` — cards, badges, tables, metrics, collapsible
+5. `skills/html/assets/interactive.css` — section glow, copy button, theme toggle, print, responsive
+6. `skills/html/assets/interactive.js` — ALL JavaScript (theme, sidebar, glow, copy)
+
+### Critical: Section Glow
+
+You MUST use the ::before pseudo-element approach from interactive.css. NEVER use box-shadow or @keyframes animation.
+
+```css
+/* Section Glow — copy from interactive.css exactly */
+h2[id], h3[id] { position: relative; transition: color 0.3s ease; }
+h2[id]::before, h3[id]::before {
+  content: ""; position: absolute;
+  left: -12px; top: -4px; bottom: -4px;
+  width: 3px; border-radius: 2px;
+  background: var(--accent);
+  opacity: 0; transform: scaleY(0);
+  transform-origin: center;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+h2.section-glow::before, h3.section-glow::before { opacity: 1; transform: scaleY(1); }
+h2.section-glow, h3.section-glow { color: var(--accent-hover); }
+```
+
+### Critical: CJK Typographic Overrides
+
+When the output language is CJK (Chinese, Japanese, Korean), you MUST override:
+
+```css
+/* In typography.css, after copying, override for CJK output: */
+body { line-height: 1.8; }
+h1 { letter-spacing: 0.02em; }  /* NOT negative — CJK needs positive spacing */
+h2 { letter-spacing: 0.02em; }
+```
+
+CJK fonts are already in tokens.css defaults. Latin scripts override with Playfair Display + Inter.
+
+### html-map Specific CSS (add these after html components)
 
 ```css
 /* Directory tree */
@@ -164,9 +199,11 @@ MUST use exact token values from `skills/html/assets/tokens.css`:
 
 /* Data flow */
 .flow-diagram { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: center; }
+.flow-step { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); text-align: center; box-shadow: var(--shadow-sm); }
 
 /* Key files cards */
-.key-file { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); }
+.key-file { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); box-shadow: var(--shadow-sm); }
+.key-file-path { font-family: var(--font-mono); font-size: .8125rem; color: var(--accent); font-weight: 500; }
 
 /* Git activity bars */
 .git-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
@@ -176,3 +213,28 @@ MUST use exact token values from `skills/html/assets/tokens.css`:
 .reading-step { display: flex; align-items: flex-start; gap: var(--space-3); padding: .625rem 0; border-bottom: 1px solid var(--border-subtle); }
 .reading-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent); font-size: .75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 ```
+
+---
+
+## 7. Output Constraints
+
+**ONLY use components defined in skills/html/assets/. NEVER invent components not specified there.**
+
+Components:
+- NEVER add language switch/link elements unless the user explicitly asks.
+- NEVER add header bars, top navigation bars, or floating action buttons.
+- NEVER add breadcrumb navigation, progress bars, search boxes, or any element not defined in assets/.
+- Theme toggle MUST be bottom-right (bottom: 2rem, right: 2rem). NEVER top-right.
+
+Layout:
+- /html-map uses the same layout as /html: sidebar (left) + main content (right).
+- NEVER add a separate header bar above the sidebar + main layout.
+- The project name and badges go INSIDE the main content area, not in a separate header bar.
+
+Typography enforcement:
+- CJK output MUST use: `letter-spacing: +0.02em` for h1/h2, `line-height: 1.8` for body.
+- NEVER use negative letter-spacing for CJK content.
+
+Section glow:
+- MUST use `::before` pseudo-element with scaleY animation (from interactive.css).
+- NEVER use box-shadow glow or @keyframes animation.

@@ -104,7 +104,28 @@ Input routing:
 
 ---
 
-## 4. Anti-Slop Rules
+## 4. Output Constraints
+
+**ONLY use components defined in this skill. NEVER invent components not specified here.**
+
+Components:
+- NEVER add language switch/link elements (e.g., "English"/"中文" toggle) unless the user explicitly asks.
+- NEVER add header bars, top navigation bars, floating action buttons, or any element not defined in the assets/ modules.
+- NEVER add breadcrumb navigation, progress bars, or search boxes.
+- Theme toggle MUST be bottom-right (bottom: 2rem, right: 2rem). NEVER top-right or top-left.
+
+Typography enforcement:
+- CJK output MUST use: `letter-spacing: +0.02em` for h1 and h2, `line-height: 1.8` for body.
+- CJK output MUST NOT use negative letter-spacing (the Latin defaults).
+- Detection rule: read first 20 lines of content. If >30% CJK characters → apply CJK typographic overrides.
+
+Section glow:
+- MUST use `::before` pseudo-element with scaleY animation (from interactive.css).
+- NEVER use box-shadow glow, @keyframes animation, or background-color animation.
+
+---
+
+## 5. Anti-Slop Rules
 
 ### NEVER
 - #fff / #000 in ANY context (including dark mode, cards, hover states)
@@ -127,17 +148,19 @@ Input routing:
 
 ---
 
-## 5. Verification Checklist
+## 6. Verification Checklist
 
 Before outputting, verify:
 - [ ] All code copied from `assets/` files (no manual CSS)?
 - [ ] No color value outside tokens?
-- [ ] Theme toggle: SVG icons (NOT emoji)?
+- [ ] Theme toggle: SVG icons (NOT emoji), bottom-right (NOT top-right)?
 - [ ] Sidebar present with h2 headings?
 - [ ] h2 elements borderless?
 - [ ] Copy buttons on all `<pre>` blocks?
-- [ ] Section glow CSS + JS included?
+- [ ] Section glow: ::before pseudo-element (NOT box-shadow)?
 - [ ] Dark mode: html.dark-mode class (NOT data-theme)?
+- [ ] CJK typographic overrides applied (if CJK output)?
+- [ ] No unauthorized components (lang-switch, header-bar, top-nav, etc.)?
 - [ ] Google Fonts link matches output script?
 - [ ] `<html lang="xx">` correct?
 - [ ] Print + reduced-motion styles included?
