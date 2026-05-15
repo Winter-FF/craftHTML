@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API Rate Limiting System — Technical Specification</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   Design Tokens — craftHTML
+   ============================================ */
+:root {
+  /* Light Mode — "Warm Paper" */
+  --bg-page: #FAF8F5;
+  --bg-surface: #F5F2ED;
+  --bg-card: #FFFFFF08;
+  --bg-card-solid: #F7F5F0;
+  --bg-code: #F5F2ED;
+  --border: #E8E4DC;
+  --border-subtle: #EDE9E2;
+  --border-focus: #C8C2B8;
+  --text-primary: #3A3A3A;
+  --text-heading: #1A1A1A;
+  --text-secondary: #6B6B6B;     /* darker than before — better readability */
+  --text-muted: #8A8780;         /* warm gray, high enough contrast for small text */
+  --accent: #8B7B68;             /* warm taupe — sienna/earth tone, not blue */
+  --accent-subtle: #8B7B6812;
+  --accent-hover: #75674F;       /* deeper earth on hover */
+  --success: #6B8E5A;
+  --success-subtle: #6B8E5A12;
+  --warning: #C4956A;
+  --warning-subtle: #C4956A12;
+  --danger: #B85C5C;
+  --danger-subtle: #B85C5C12;
+
+  /* Elevation — shadow system */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.03);
+
+  /* Typography */
+  --font-heading: "Noto Serif SC", "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", "Source Sans 3", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+
+  /* Spacing — 4px grid */
+  --space-1: 0.25rem;    /*  4px */
+  --space-2: 0.5rem;     /*  8px */
+  --space-3: 0.75rem;    /* 12px */
+  --space-4: 1rem;       /* 16px */
+  --space-6: 1.5rem;     /* 24px */
+  --space-8: 2rem;       /* 32px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.15, 1);
+  --duration-fast: 180ms;
+  --duration-normal: 300ms;
+  --duration-slow: 450ms;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 9999px;
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1, "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   Layout
+   ============================================ */
+.layout {
+  display: flex;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-12) var(--space-12) var(--space-8);
+  gap: 0;
+}
+
+.main {
+  flex: 1;
+  max-width: 780px;
+  min-width: 0;
+  padding-left: var(--space-12);
+}
+
+/* ============================================
+   Sidebar Navigation
+   ============================================ */
+.sidebar {
+  position: sticky;
+  top: 3rem;
+  width: 240px;
+  flex-shrink: 0;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-8) var(--space-8) 0;
+  font-size: 0.875rem;      /* 14px — readable without zooming */
+  line-height: 1.5;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}
+
+.sidebar-title {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  padding-left: 0.875rem;
+}
+
+.sidebar ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sidebar li {
+  margin: 0;
+}
+
+.sidebar a {
+  display: block;
+  padding: 0.4375rem 0.875rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+  position: relative;
+}
+
+.sidebar a:hover {
+  color: var(--text-primary);
+  background: var(--accent-subtle);
+}
+
+.sidebar a.active {
+  color: var(--text-heading);
+  font-weight: 500;
+  background: var(--accent-subtle);
+}
+
+.sidebar a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+h1, h2, h3, h4 {
+  color: var(--text-heading);
+  line-height: 1.25;
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-size: 2rem;              /* 32px — ×1.25 from h2 */
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  margin: 0 0 var(--space-8);
+}
+
+h2 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;            /* 24px — ×1.25 from h3 */
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-4);
+}
+
+h3 {
+  font-family: var(--font-body);
+  font-size: 1.1875rem;         /* 19px — ×1.1875 from body, clear step up */
+  font-weight: 500;             /* 500, not 600 — consistent with h1/h2 weight */
+  letter-spacing: -0.005em;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
+}
+
+h4 {
+  font-family: var(--font-body);
+  font-size: 1rem;              /* 16px — same as body, differentiated by weight */
+  font-weight: 600;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+p {
+  margin-bottom: var(--space-4);
+}
+
+p.lead {
+  font-size: 1.125rem;          /* 18px — subtle step above body, not competing with h3 */
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--accent-hover);
+  border-bottom-color: var(--accent);
+}
+
+strong {
+  font-weight: 600;
+  color: var(--text-heading);
+}
+
+/* ============================================
+   Metadata Header
+   ============================================ */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) 2.5rem;
+  margin-bottom: var(--space-12);
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meta-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.meta-value {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* ============================================
+   Badges
+   ============================================ */
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  vertical-align: middle;
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.badge-accent {
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.badge-success {
+  color: var(--success);
+  background: var(--success-subtle);
+}
+
+.badge-warning {
+  color: var(--warning);
+  background: var(--warning-subtle);
+}
+
+.badge-danger {
+  color: var(--danger);
+  background: var(--danger-subtle);
+}
+
+/* ============================================
+   Cards — layered depth system
+   ============================================ */
+.card {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.card-accent {
+  border-left: 3px solid var(--accent);
+}
+
+.card h3, .card h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* ============================================
+   Tables
+   ============================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-bottom: var(--space-8);
+}
+
+th {
+  font-weight: 500;
+  text-align: left;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+td {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+tr > * + * {
+  padding-left: 1.25rem;
+}
+
+tr:hover td {
+  color: var(--text-heading);
+}
+
+.tier-highlight {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ============================================
+   Code
+   ============================================ */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg-code);
+  color: var(--text-heading);
+  padding: 0.15em 0.45em;
+  border-radius: var(--radius-sm);
+}
+
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin-bottom: var(--space-8);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.code-label {
+  position: absolute;
+  bottom: 0.625rem;
+  right: 1rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   Lists
+   ============================================ */
+ul, ol {
+  margin-bottom: var(--space-4);
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: var(--space-1);
+}
+
+li::marker {
+  color: var(--text-muted);
+}
+
+/* ============================================
+   Collapsible Sections
+   ============================================ */
+details {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+  background: var(--bg-card-solid);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+details:hover {
+  box-shadow: var(--shadow-md);
+}
+
+details[open] {
+  padding-bottom: 0.5rem;
+}
+
+summary {
+  padding: 0.875rem 1.25rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-heading);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: color var(--duration-fast) var(--ease-out);
+  border-radius: var(--radius-md);
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4.5px solid var(--text-muted);
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  flex-shrink: 0;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+summary:hover {
+  color: var(--accent);
+}
+
+summary:hover::before {
+  border-left-color: var(--accent);
+}
+
+details .detail-content {
+  padding: 0 1.25rem 0.25rem;
+}
+
+/* ============================================
+   Key Metrics Grid
+   ============================================ */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition:
+    box-shadow var(--duration-normal) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out);
+}
+
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 500;
+  color: var(--text-heading);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.metric-unit {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+/* ============================================
+   Phase Timeline
+   ============================================ */
+.timeline {
+  position: relative;
+  padding-left: 2.25rem;
+  margin-bottom: var(--space-8);
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 4px;
+  bottom: 4px;
+  width: 1.5px;
+  background: linear-gradient(to bottom, var(--accent), var(--border));
+  border-radius: var(--radius-pill);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-bottom: 0.25rem;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -2.25rem;
+  top: 3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--bg-page);
+  border: 2px solid var(--border-focus);
+  box-shadow: 0 0 0 3px var(--bg-page);
+  transition: border-color var(--duration-normal) var(--ease-out), background var(--duration-normal) var(--ease-out);
+}
+
+.timeline-item.active .timeline-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--bg-page), 0 0 0 5px var(--accent-subtle);
+}
+
+.timeline-phase {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.timeline-title {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-heading);
+  margin-bottom: 0.25rem;
+}
+
+.timeline-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================
+   Section Anchors
+   ============================================ */
+.section-anchor {
+  scroll-margin-top: 2rem;
+}
+
+.heading-anchor {
+  color: var(--text-heading);
+  text-decoration: none;
+}
+
+.heading-anchor:hover {
+  border-bottom: none;
+}
+
+.heading-anchor:hover::after {
+  content: " #";
+  color: var(--border-focus);
+  font-size: 0.8em;
+}
+
+/* Section highlight glow on navigate */
+h2[id], h3[id] {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+h2[id]::before, h3[id]::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+h2.section-glow::before, h3.section-glow::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+h2.section-glow, h3.section-glow {
+  color: var(--accent-hover);
+}
+
+/* ============================================
+   Dark Mode — "Warm Ink"
+   Class-based for toggle support.
+   Also honors system preference as default.
+   ============================================ */
+html.dark-mode,
+html.dark-default:not(.light-mode) {
+  --bg-page: #1C1C1B;
+  --bg-surface: #242423;
+  --bg-card-solid: #262625;
+  --bg-code: #222221;
+  --border: #383836;
+  --border-subtle: #30302E;
+  --border-focus: #52524E;
+  --text-primary: #D2CEC6;
+  --text-heading: #E6E2DA;
+  --text-secondary: #908C84;
+  --text-muted: #7A776F;
+  --accent: #C4AD94;
+  --accent-subtle: #C4AD9418;
+  --accent-hover: #D4BDA3;
+  --success: #8FB07A;
+  --success-subtle: #8FB07A18;
+  --warning: #D4AD7A;
+  --warning-subtle: #D4AD7A18;
+  --danger: #D08080;
+  --danger-subtle: #D0808018;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.15);
+  --shadow-hover: 0 8px 24px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.18);
+}
+
+/* ============================================
+   Theme Toggle Button
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card-solid);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    box-shadow var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    background var(--duration-normal) var(--ease-out);
+  z-index: 100;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--text-secondary);
+}
+
+.theme-toggle:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-focus);
+  color: var(--text-heading);
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+
+html.dark-mode .theme-toggle .icon-sun,
+html.dark-default:not(.light-mode) .theme-toggle .icon-sun {
+  display: block;
+}
+
+html.dark-mode .theme-toggle .icon-moon,
+html.dark-default:not(.light-mode) .theme-toggle .icon-moon {
+  display: none;
+}
+
+/* ============================================
+   Copy Button for Code Blocks
+   ============================================ */
+pre {
+  position: relative;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-solid);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+  z-index: 2;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.copy-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+pre:hover .copy-btn {
+  opacity: 1;
+}
+
+.copy-btn:hover {
+  color: var(--text-heading);
+  border-color: var(--border-focus);
+}
+
+.copy-btn.copied {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+  .sidebar {
+    display: none;
+  }
+
+  .theme-toggle, .copy-btn {
+    display: none !important;
+  }
+
+  .layout {
+    display: block;
+    padding: 0;
+  }
+
+  .main {
+    max-width: 100%;
+    padding-left: 0;
+  }
+
+  body {
+    background: white;
+    color: #1a1a1a;
+    font-size: 11pt;
+  }
+
+  .card, details, .metric-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    break-inside: avoid;
+  }
+
+  details[open] summary ~ * {
+    display: block;
+  }
+
+  a {
+    color: #1a1a1a;
+    text-decoration: underline;
+  }
+
+  h2 {
+    page-break-after: avoid;
+  }
+
+  .timeline-dot {
+    box-shadow: none;
+  }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar {
+    display: none;
+  }
+
+  .layout {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .main {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  html {
+    font-size: 15px;
+  }
+
+  .layout {
+    padding: 1.5rem 1.25rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .meta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  table {
+    font-size: 0.8125rem;
+  }
+
+  .card, details {
+    padding: 1.25rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" role="navigation" aria-label="Document sections">
+    <div class="sidebar-title">Contents</div>
+    <ul>
+      <li><a href="#overview" class="active">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#rate-limits">Rate Limit Tiers</a></li>
+      <li><a href="#responses">Response Format</a></li>
+      <li><a href="#configuration">Configuration</a></li>
+      <li><a href="#error-handling">Error Handling</a></li>
+      <li><a href="#monitoring">Monitoring</a></li>
+      <li><a href="#migration">Migration Plan</a></li>
+      <li><a href="#open-questions">Open Questions</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <article class="main">
+
+    <h1>API Rate Limiting System</h1>
+
+    <!-- Metadata -->
+    <div class="meta">
+      <div class="meta-item">
+        <span class="meta-label">Author</span>
+        <span class="meta-value">Team Platform</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Date</span>
+        <span class="meta-value">May 10, 2026</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Status</span>
+        <span class="badge badge-warning">Draft</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Type</span>
+        <span class="badge badge-accent">Technical Specification</span>
+      </div>
+    </div>
+
+    <!-- Executive Summary Card -->
+    <div class="card card-accent">
+      <h4 style="margin-top: 0;">Summary</h4>
+      <p style="margin-bottom: 0;">A sliding-window rate limiting system for the public API, using Redis for distributed state. Supports per-tenant and per-endpoint limits with three pricing tiers. Target: 10K+ req/s with &lt;5ms added latency.</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">Target Throughput</div>
+        <div class="metric-value">10K<span class="metric-unit"> req/s</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Max Latency</div>
+        <div class="metric-value">&lt;5<span class="metric-unit"> ms</span></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Tiers</div>
+        <div class="metric-value">3</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Rollout</div>
+        <div class="metric-value">7<span class="metric-unit"> weeks</span></div>
+      </div>
+    </div>
+
+    <!-- Overview -->
+    <h2 id="overview" class="section-anchor"><a href="#overview" class="heading-anchor">Overview</a></h2>
+
+    <p>Our current API has no rate limiting. This has led to several incidents where a single tenant consumed all available resources, causing degradation for other users. We need a fair, transparent, and configurable rate limiting system.</p>
+
+    <details>
+      <summary>Stakeholder Requirements</summary>
+      <div class="detail-content">
+        <ul>
+          <li>Must support per-tenant limits</li>
+          <li>Must support per-endpoint limits</li>
+          <li>Must provide clear feedback when limits are hit</li>
+          <li>Must not add more than 5ms latency per request</li>
+          <li>Must be observable and auditable</li>
+        </ul>
+      </div>
+    </details>
+
+    <!-- Architecture -->
+    <h2 id="architecture" class="section-anchor"><a href="#architecture" class="heading-anchor">Architecture</a></h2>
+
+    <p>The rate limiter sits between the API gateway and the application layer. It uses a sliding window counter algorithm stored in Redis for distributed state management.</p>
+
+    <h3>Components</h3>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Responsibility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Rate Limiter Middleware</strong></td>
+            <td>Express middleware intercepting all API requests</td>
+          </tr>
+          <tr>
+            <td><strong>Redis Cluster</strong></td>
+            <td>Stores sliding window counters with TTL-based expiry</td>
+          </tr>
+          <tr>
+            <td><strong>Config Service</strong></td>
+            <td>Manages per-tenant and per-endpoint limit configurations</td>
+          </tr>
+          <tr>
+            <td><strong>Metrics Collector</strong></td>
+            <td>Emits rate limiting metrics to the observability stack</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Data Flow</h3>
+
+    <div class="card card-accent" style="text-align: center; padding: 2rem;">
+      <code style="font-size: 0.9rem; background: none; padding: 0;">Request &rarr; API Gateway &rarr; Rate Limiter &rarr; Redis &rarr; <span style="color: var(--success);">200</span> / <span style="color: var(--danger);">429</span></code>
+    </div>
+
+    <h3>Redis Key Schema</h3>
+
+    <pre><code><span class="code-label">Key Pattern</span>
+ratelimit:{tenant_id}:{endpoint}:{window_start}
+
+<span style="color: var(--text-secondary);">// Example</span>
+ratelimit:acme-corp:/api/users:1715337600</code></pre>
+
+    <details>
+      <summary>Sliding Window Algorithm</summary>
+      <div class="detail-content">
+        <ol>
+          <li>Calculate the current window timestamp (floor to window size)</li>
+          <li>Calculate the weight of the previous window based on overlap</li>
+          <li><code>weighted_count = current + (previous &times; overlap_percentage)</code></li>
+          <li>If <code>weighted_count &ge; limit</code>, reject with 429</li>
+        </ol>
+        <p style="margin-bottom: 0;">This provides smoother rate limiting than fixed windows while being more memory-efficient than true sliding window logs.</p>
+      </div>
+    </details>
+
+    <!-- Rate Limit Tiers -->
+    <h2 id="rate-limits" class="section-anchor"><a href="#rate-limits" class="heading-anchor">Rate Limit Tiers</a></h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Requests/min</th>
+          <th>Requests/hour</th>
+          <th>Burst</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Free</strong></td>
+          <td>60</td>
+          <td>1,000</td>
+          <td>10</td>
+          <td>$0</td>
+        </tr>
+        <tr>
+          <td class="tier-highlight">Pro</td>
+          <td>600</td>
+          <td>50,000</td>
+          <td>50</td>
+          <td>$49/mo</td>
+        </tr>
+        <tr>
+          <td><strong>Enterprise</strong></td>
+          <td>6,000</td>
+          <td>500,000</td>
+          <td>200</td>
+          <td>Custom</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Response Format -->
+    <h2 id="responses" class="section-anchor"><a href="#responses" class="heading-anchor">Response Format</a></h2>
+
+    <p>When rate limited, return HTTP <code>429</code> with the following JSON body and headers:</p>
+
+    <pre><code><span class="code-label">JSON Response</span>{
+  "error": "rate_limit_exceeded",
+  "message": "Rate limit exceeded. Try again in 23 seconds.",
+  "retry_after": 23,
+  "limit": 600,
+  "remaining": 0,
+  "reset_at": "2026-05-10T14:30:00Z"
+}</code></pre>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Header</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>X-RateLimit-Limit</code></td>
+            <td>Maximum requests per window</td>
+          </tr>
+          <tr>
+            <td><code>X-RateLimit-Remaining</code></td>
+            <td>Requests remaining in current window</td>
+          </tr>
+          <tr>
+            <td><code>X-RateLimit-Reset</code></td>
+            <td>Unix timestamp when the window resets</td>
+          </tr>
+          <tr>
+            <td><code>Retry-After</code></td>
+            <td>Seconds until the client should retry</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Configuration -->
+    <h2 id="configuration" class="section-anchor"><a href="#configuration" class="heading-anchor">Configuration</a></h2>
+
+    <pre><code><span class="code-label">YAML</span>default_limits:
+  requests_per_minute: 60
+  requests_per_hour: 1000
+  burst_size: 10
+
+tenant_overrides:
+  acme-corp:
+    requests_per_minute: 600
+    requests_per_hour: 50000
+
+endpoint_overrides:
+  /api/search:
+    requests_per_minute: 30
+    burst_size: 5
+  /api/bulk:
+    requests_per_minute: 10
+    burst_size: 2</code></pre>
+
+    <!-- Error Handling -->
+    <h2 id="error-handling" class="section-anchor"><a href="#error-handling" class="heading-anchor">Error Handling</a></h2>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Failure</th>
+            <th>Strategy</th>
+            <th>Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Redis down</strong></td>
+            <td><span class="badge badge-accent">Fail Open</span></td>
+            <td>Allow requests, log alert</td>
+          </tr>
+          <tr>
+            <td><strong>Config service down</strong></td>
+            <td><span class="badge badge-warning">Cache</span></td>
+            <td>Use cached config, expire after 5 min</td>
+          </tr>
+          <tr>
+            <td><strong>Counter overflow</strong></td>
+            <td><span class="badge badge-danger">Cap</span></td>
+            <td>Cap at 2&times; limit, log anomaly</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Monitoring -->
+    <h2 id="monitoring" class="section-anchor"><a href="#monitoring" class="heading-anchor">Monitoring</a></h2>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>rate_limit_total</code></td>
+            <td>Total rate limit checks performed</td>
+          </tr>
+          <tr>
+            <td><code>rate_limit_rejected</code></td>
+            <td>Total 429 responses issued</td>
+          </tr>
+          <tr>
+            <td><code>rate_limit_latency_ms</code></td>
+            <td>P50 / P95 / P99 latency of check</td>
+          </tr>
+          <tr>
+            <td><code>rate_limit_redis_errors</code></td>
+            <td>Redis connection failures</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p><strong>Dashboard:</strong> <a href="#">rate-limits.internal/observability</a></p>
+
+    <!-- Migration Plan -->
+    <h2 id="migration" class="section-anchor"><a href="#migration" class="heading-anchor">Migration Plan</a></h2>
+
+    <div class="timeline">
+      <div class="timeline-item active">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 1 &mdash; Week 1&ndash;2</div>
+        <div class="timeline-title">Shadow Mode</div>
+        <div class="timeline-desc">Deploy in shadow mode &mdash; log what would be rejected but don&rsquo;t actually reject</div>
+      </div>
+      <div class="timeline-item active">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 2 &mdash; Week 3&ndash;4</div>
+        <div class="timeline-title">Free Tier Rollout</div>
+        <div class="timeline-desc">Enable for Free tier only, monitor closely</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 3 &mdash; Week 5&ndash;6</div>
+        <div class="timeline-title">Full Rollout</div>
+        <div class="timeline-desc">Enable for all tiers, with manual override capability</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-phase">Phase 4 &mdash; Week 7+</div>
+        <div class="timeline-title">Full Enforcement</div>
+        <div class="timeline-desc">Remove manual override, full enforcement</div>
+      </div>
+    </div>
+
+    <!-- Open Questions -->
+    <h2 id="open-questions" class="section-anchor"><a href="#open-questions" class="heading-anchor">Open Questions</a></h2>
+
+    <details>
+      <summary>Should we support per-second sliding windows for burst protection?</summary>
+      <div class="detail-content">
+        <p style="margin-bottom: 0;">Current design only supports per-minute granularity. Per-second windows would provide tighter burst control but increase Redis write volume significantly. Needs load testing to determine if the tradeoff is worthwhile.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>How do we handle rate limits for webhook deliveries?</summary>
+      <div class="detail-content">
+        <p style="margin-bottom: 0;">Webhooks have a different traffic pattern (outbound, bursty, retry-heavy). They may need separate rate limit buckets or a different algorithm entirely. Needs further investigation.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Should rate limit headers be included on all responses or only on 429s?</summary>
+      <div class="detail-content">
+        <p style="margin-bottom: 0;">Including headers on all responses helps clients implement proactive throttling but adds slight overhead to every response. Recommendation: include on all responses for the best developer experience.</p>
+      </div>
+    </details>
+
+  </article>
+
+</div>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+  <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+
+<script>
+(function() {
+  /* ============================================
+     Theme Toggle
+     ============================================ */
+  var html = document.documentElement;
+  var stored = localStorage.getItem('theme');
+
+  if (stored === 'dark') {
+    html.classList.add('dark-mode');
+  } else if (stored === 'light') {
+    html.classList.add('light-mode');
+  } else {
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      html.classList.add('dark-default');
+    }
+  }
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var isDark = html.classList.contains('dark-mode') ||
+      (html.classList.contains('dark-default') && !html.classList.contains('light-mode'));
+
+    html.classList.remove('dark-mode', 'light-mode', 'dark-default');
+
+    if (isDark) {
+      html.classList.add('light-mode');
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  /* ============================================
+     Sidebar Active State
+     ============================================ */
+  var sidebarLinks = document.querySelectorAll('.sidebar a');
+  var sectionIds = [];
+  sidebarLinks.forEach(function(link) {
+    sectionIds.push({ id: link.getAttribute('href').slice(1), link: link });
+  });
+
+  function updateSidebar() {
+    var scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    var viewH = window.innerHeight;
+    var docH = document.documentElement.scrollHeight;
+    var isAtBottom = scrollY + viewH >= docH - 50;
+    var current = null;
+
+    if (isAtBottom) {
+      current = sectionIds[sectionIds.length - 1];
+    } else {
+      for (var i = sectionIds.length - 1; i >= 0; i--) {
+        var el = document.getElementById(sectionIds[i].id);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          current = sectionIds[i];
+          break;
+        }
+      }
+      if (!current && sectionIds.length > 0) current = sectionIds[0];
+    }
+
+    sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }
+
+  /* Section glow effect */
+  function glowSection(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('section-glow');
+    void el.offsetWidth;
+    el.classList.add('section-glow');
+    setTimeout(function() { el.classList.remove('section-glow'); }, 1500);
+  }
+
+  /* Click: highlight sidebar + glow target */
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = link.getAttribute('href').slice(1);
+      var target = document.getElementById(id);
+
+      sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+      link.classList.add('active');
+
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(function() { glowSection(id); }, 350);
+      }
+    });
+  });
+
+  /* Scroll: glow when crossing section boundaries */
+  var prevActiveId = null;
+  function onScroll() {
+    updateSidebar();
+    var active = null;
+    sidebarLinks.forEach(function(l) { if (l.classList.contains('active')) active = l; });
+    if (active) {
+      var curId = active.getAttribute('href').slice(1);
+      if (prevActiveId !== null && curId !== prevActiveId) glowSection(curId);
+      prevActiveId = curId;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', updateSidebar, { passive: true });
+  setTimeout(updateSidebar, 300);
+  updateSidebar();
+
+  /* ============================================
+     Copy Buttons for Code Blocks
+     ============================================ */
+  var copyIcon = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  var checkIcon = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  document.querySelectorAll('pre').forEach(function(pre) {
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.innerHTML = copyIcon + 'Copy';
+    btn.setAttribute('aria-label', 'Copy code');
+
+    btn.addEventListener('click', function() {
+      var code = pre.querySelector('code');
+      var text = code ? code.textContent : pre.textContent;
+
+      navigator.clipboard.writeText(text).then(function() {
+        btn.innerHTML = checkIcon + 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.innerHTML = copyIcon + 'Copy';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    pre.appendChild(btn);
+  });
+})();
+</script>
+
+</body>
+</html>

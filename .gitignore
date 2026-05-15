@@ -1,0 +1,25 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+
+# Internal docs (not part of the release)
+docs/
+
+# Test artifacts
+test-projects/
+test-output/
+.spec-workflow
+
+# Logs
+*.log
+
+# Temporary
+*.tmp
+*.bak

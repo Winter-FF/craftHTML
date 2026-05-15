@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Map — TaskFlow API</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#FAF8F5;--bg-surface:#F5F2ED;--bg-card-solid:#F7F5F0;--bg-code:#F5F2ED;--border:#E8E4DC;--border-subtle:#EDE9E2;--border-focus:#C8C2B8;--text-primary:#3A3A3A;--text-heading:#1A1A1A;--text-secondary:#6B6B6B;--text-muted:#8A8780;--accent:#8B7B68;--accent-subtle:#8B7B6812;--accent-hover:#75674F;--success:#6B8E5A;--success-subtle:#6B8E5A12;--warning:#C4956A;--warning-subtle:#C4956A12;--danger:#B85C5C;--danger-subtle:#B85C5C12;--shadow-sm:0 1px 2px rgba(0,0,0,0.04);--shadow-md:0 2px 8px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.03);--shadow-lg:0 4px 16px rgba(0,0,0,0.05),0 2px 4px rgba(0,0,0,0.03);--font-heading:"Noto Serif SC","Playfair Display",Georgia,"Times New Roman",serif;--font-body:"Noto Sans SC","Inter","Source Sans 3",system-ui,-apple-system,sans-serif;--font-mono:"JetBrains Mono","Fira Code","Cascadia Code",Consolas,monospace;--space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-6:1.5rem;--space-8:2rem;--space-12:3rem;--ease-out:cubic-bezier(0.16,1,0.3,1);--duration-fast:180ms;--duration-normal:300ms;--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-pill:9999px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth;scroll-padding-top:2rem}
+body{font-family:var(--font-body);font-weight:400;color:var(--text-primary);background:var(--bg-page);line-height:1.75;letter-spacing:.01em;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+.layout{display:flex;max-width:1100px;margin:0 auto;padding:var(--space-12) var(--space-12) var(--space-12) var(--space-8);gap:0}
+.main{flex:1;max-width:780px;min-width:0;padding-left:var(--space-12)}
+.sidebar{position:sticky;top:3rem;width:240px;flex-shrink:0;max-height:calc(100vh - 6rem);overflow-y:auto;padding:var(--space-8) var(--space-8) var(--space-8) 0;font-size:.875rem;line-height:1.5}
+.sidebar::-webkit-scrollbar{width:0;display:none}
+.sidebar-title{font-weight:500;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:1.25rem;padding-left:.875rem}
+.sidebar ul{list-style:none;display:flex;flex-direction:column;gap:1px}
+.sidebar li{margin:0}
+.sidebar a{display:block;padding:.4375rem .875rem;color:var(--text-secondary);text-decoration:none;border-radius:var(--radius-sm);transition:color var(--duration-fast) var(--ease-out),background var(--duration-fast) var(--ease-out);position:relative}
+.sidebar a:hover{color:var(--text-primary);background:var(--accent-subtle)}
+.sidebar a.active{color:var(--text-heading);font-weight:500;background:var(--accent-subtle)}
+.sidebar a.active::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--accent);border-radius:var(--radius-pill)}
+h1,h2,h3,h4{color:var(--text-heading);line-height:1.25}
+h1{font-family:var(--font-heading);font-size:2rem;font-weight:500;letter-spacing:-.025em;margin:0 0 var(--space-2)}
+h2{font-family:var(--font-heading);font-size:1.5rem;font-weight:500;letter-spacing:-.015em;margin-top:var(--space-12);margin-bottom:var(--space-4)}
+h3{font-size:1.1875rem;font-weight:500;margin-top:var(--space-8);margin-bottom:var(--space-3)}
+h4{font-size:1rem;font-weight:600;margin-top:var(--space-6);margin-bottom:var(--space-2)}
+p{margin-bottom:var(--space-4)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
+a:hover{color:var(--accent-hover);border-bottom-color:var(--accent)}
+strong{font-weight:600;color:var(--text-heading)}
+code{font-family:var(--font-mono);font-size:.85em;background:var(--bg-code);color:var(--text-heading);padding:.15em .45em;border-radius:var(--radius-sm)}
+.badge{display:inline-block;padding:.2em .7em;font-size:.75rem;font-weight:500;border-radius:var(--radius-pill);text-transform:uppercase;vertical-align:middle}
+.badge-accent{color:var(--accent);background:var(--accent-subtle)}.badge-success{color:var(--success);background:var(--success-subtle)}.badge-warning{color:var(--warning);background:var(--warning-subtle)}.badge-danger{color:var(--danger);background:var(--danger-subtle)}
+.card{background:var(--bg-card-solid);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:1.75rem 2rem;margin-bottom:1.25rem;box-shadow:var(--shadow-sm);transition:box-shadow var(--duration-normal) var(--ease-out)}.card:hover{box-shadow:var(--shadow-md)}.card-accent{border-left:3px solid var(--accent)}.card h3,.card h4{margin-top:0;margin-bottom:.75rem}
+table{width:100%;border-collapse:collapse;font-size:.875rem;margin-bottom:var(--space-4)}
+th{font-weight:500;text-align:left;padding:.625rem 0;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.04em}
+td{padding:.625rem 0;border-bottom:1px solid var(--border-subtle);color:var(--text-primary)}tr>*+*{padding-left:1.25rem}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:2rem}
+.metric-card{background:var(--bg-card-solid);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:1.5rem 1.25rem;text-align:center;box-shadow:var(--shadow-sm);transition:box-shadow var(--duration-normal) var(--ease-out),transform var(--duration-normal) var(--ease-out)}.metric-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.metric-label{font-size:.75rem;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--text-muted);margin-bottom:.5rem}.metric-value{font-family:var(--font-heading);font-size:2.25rem;font-weight:500;color:var(--text-heading);line-height:1.1;letter-spacing:-.02em}.metric-unit{font-size:.75rem;color:var(--text-secondary);font-weight:400}
+
+/* Header */
+.header{margin-bottom:var(--space-8);padding-bottom:var(--space-6);border-bottom:1px solid var(--border-subtle)}
+.header-desc{font-size:1.0625rem;color:var(--text-secondary);margin-bottom:var(--space-4);line-height:1.6}
+.header-tags{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+
+/* Directory tree */
+.tree{font-family:var(--font-mono);font-size:.8125rem;line-height:1.9}
+.tree details{border:none;background:none;box-shadow:none;margin:0;padding:0;overflow:visible}
+.tree details:hover{box-shadow:none}
+.tree summary{padding:0;font-size:.8125rem;font-weight:400;color:var(--text-primary);gap:.5rem}
+.tree summary::before{border-left:4px solid var(--text-muted);border-top:3px solid transparent;border-bottom:3px solid transparent}
+.tree details[open]>summary::before{transform:rotate(90deg)}
+.tree summary:hover{color:var(--accent)}.tree summary:hover::before{border-left-color:var(--accent)}
+.tree .folder-name{font-weight:500}
+.tree .dir-purpose{color:var(--text-muted);font-family:var(--font-body);font-size:.75rem;margin-left:.5rem}
+.tree .indent{padding-left:1.5rem}
+.tree .file{padding:.1rem 0}
+.tree .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:.4rem;vertical-align:middle}
+.dot-source{background:var(--text-heading)}.dot-config{background:var(--text-muted)}.dot-test{background:var(--success)}.dot-doc{background:var(--accent)}
+
+/* Data flow */
+.flow-diagram{display:flex;align-items:center;justify-content:center;gap:var(--space-3);flex-wrap:wrap;padding:var(--space-4) 0}
+.flow-step{background:var(--bg-card-solid);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:var(--space-3) var(--space-4);text-align:center;box-shadow:var(--shadow-sm)}
+.flow-step-name{font-size:.875rem;font-weight:500;color:var(--text-heading)}
+.flow-step-file{font-size:.6875rem;color:var(--text-muted);font-family:var(--font-mono);margin-top:2px}
+.flow-arrow{color:var(--text-muted);font-size:1.25rem;flex-shrink:0}
+
+/* Key files grid */
+.key-files-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-4)}
+.key-file{background:var(--bg-card-solid);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:var(--space-4);box-shadow:var(--shadow-sm);transition:box-shadow var(--duration-normal) var(--ease-out)}
+.key-file:hover{box-shadow:var(--shadow-md)}
+.key-file-path{font-family:var(--font-mono);font-size:.8125rem;color:var(--accent);font-weight:500}
+.key-file-purpose{font-size:.875rem;color:var(--text-primary);margin-top:var(--space-1)}
+.key-file-why{font-size:.8125rem;color:var(--text-secondary);margin-top:var(--space-1);font-style:italic}
+.key-file-exports{font-size:.75rem;color:var(--text-muted);margin-top:var(--space-2);font-family:var(--font-mono)}
+
+/* Architecture SVG */
+.arch-wrap{text-align:center;padding:var(--space-4) 0}
+.arch-wrap svg{max-width:100%;height:auto}
+
+/* Git bars */
+.git-bars{display:flex;align-items:flex-end;gap:3px;height:60px;padding:var(--space-3) 0}
+.git-bar{flex:1;min-width:4px;background:var(--accent-subtle);border-radius:2px 2px 0 0;transition:background var(--duration-fast) var(--ease-out);cursor:default}
+.git-bar:hover{background:var(--accent)}
+
+/* Heatmap */
+.heatmap-row{display:flex;align-items:center;gap:var(--space-3);padding:.5rem 0;border-bottom:1px solid var(--border-subtle)}
+.heatmap-row:last-child{border-bottom:none}
+.heatmap-file{font-family:var(--font-mono);font-size:.8125rem;color:var(--accent);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.heatmap-bar-wrap{width:120px;flex-shrink:0}
+.heatmap-bar{height:8px;border-radius:var(--radius-pill);background:var(--accent-subtle)}
+.heatmap-bar.high{background:var(--accent)}.heatmap-bar.med{background:var(--accent);opacity:.5}.heatmap-bar.low{background:var(--accent);opacity:.25}
+.heatmap-count{font-size:.75rem;color:var(--text-muted);width:40px;text-align:right;flex-shrink:0}
+
+/* Reading path */
+.reading-step{display:flex;align-items:flex-start;gap:var(--space-3);padding:.625rem 0;border-bottom:1px solid var(--border-subtle)}
+.reading-step:last-child{border-bottom:none}
+.reading-num{width:28px;height:28px;border-radius:50%;background:var(--accent-subtle);color:var(--accent);font-size:.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.reading-file{font-family:var(--font-mono);font-size:.8125rem;color:var(--accent);font-weight:500}
+.reading-why{font-size:.8125rem;color:var(--text-secondary);margin-top:2px}
+
+/* Decision cards */
+.decision-card{background:var(--bg-card-solid);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-3);border-left:3px solid var(--accent)}
+.decision-what{font-weight:600;color:var(--text-heading);font-size:.9375rem}
+.decision-why{font-size:.875rem;color:var(--text-primary);margin-top:var(--space-1)}
+.decision-tradeoff{font-size:.8125rem;color:var(--text-muted);margin-top:var(--space-1)}
+
+/* Coverage */
+.coverage{display:flex;gap:var(--space-6);flex-wrap:wrap}
+.coverage-item{font-size:.8125rem}.coverage-item span{font-weight:600;color:var(--text-heading)}.coverage-item.muted{color:var(--text-muted)}
+
+/* Env table required badge */
+.req-yes{color:var(--danger);font-weight:500}.req-no{color:var(--text-muted)}
+
+/* Steps list */
+.steps{counter-reset:step}
+.step{display:flex;gap:var(--space-3);padding:.5rem 0}
+.step-num{counter-increment:step;width:24px;height:24px;border-radius:50%;background:var(--accent-subtle);color:var(--accent);font-size:.75rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{font-size:.875rem}
+.step-content code{font-size:.8em}
+
+/* Two-col layout */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+
+/* Copy button */
+.copy-btn{position:absolute;top:.625rem;right:.625rem;padding:.35rem .6rem;border-radius:var(--radius-sm);border:1px solid var(--border-subtle);background:var(--bg-card-solid);color:var(--text-muted);font-family:var(--font-body);font-size:.6875rem;font-weight:500;cursor:pointer;opacity:0;transition:opacity var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out);z-index:2;line-height:1;display:flex;align-items:center;gap:.3rem}
+.copy-btn svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{color:var(--text-heading);border-color:var(--border-focus)}
+.copy-btn.copied{color:var(--success);border-color:var(--success)}
+
+/* Section glow */
+h2[id],h3[id]{position:relative;transition:color .3s ease}
+h2[id]::before,h3[id]::before{content:"";position:absolute;left:-12px;top:-4px;bottom:-4px;width:3px;border-radius:2px;background:var(--accent);opacity:0;transform:scaleY(0);transform-origin:center;transition:opacity .3s ease,transform .3s cubic-bezier(.34,1.56,.64,1)}
+h2.section-glow::before,h3.section-glow::before{opacity:1;transform:scaleY(1)}
+h2.section-glow,h3.section-glow{color:var(--accent-hover)}
+.section-anchor{scroll-margin-top:2rem}
+
+/* Theme toggle */
+.theme-toggle{position:fixed;bottom:2rem;right:2rem;width:40px;height:40px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card-solid);box-shadow:var(--shadow-md);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:box-shadow var(--duration-normal) var(--ease-out),border-color var(--duration-normal) var(--ease-out);z-index:100;padding:0;font-size:1rem;color:var(--text-secondary)}
+.theme-toggle:hover{box-shadow:var(--shadow-lg);border-color:var(--border-focus);color:var(--text-heading)}
+.theme-toggle svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle .icon-sun{display:none}.theme-toggle .icon-moon{display:block}
+html.dark-mode .theme-toggle .icon-sun,html.dark-default:not(.light-mode) .theme-toggle .icon-sun{display:block}
+html.dark-mode .theme-toggle .icon-moon,html.dark-default:not(.light-mode) .theme-toggle .icon-moon{display:none}
+
+html.dark-mode,html.dark-default:not(.light-mode){--bg-page:#1C1C1B;--bg-surface:#242423;--bg-card-solid:#262625;--bg-code:#222221;--border:#383836;--border-subtle:#30302E;--border-focus:#52524E;--text-primary:#D2CEC6;--text-heading:#E6E2DA;--text-secondary:#908C84;--text-muted:#7A776F;--accent:#C4AD94;--accent-subtle:#C4AD9418;--accent-hover:#D4BDA3;--success:#8FB07A;--success-subtle:#8FB07A18;--warning:#D4AD7A;--warning-subtle:#D4AD7A18;--danger:#D08080;--danger-subtle:#D0808018;--shadow-sm:0 1px 3px rgba(0,0,0,0.2);--shadow-md:0 2px 8px rgba(0,0,0,0.25),0 1px 3px rgba(0,0,0,0.12);--shadow-lg:0 4px 16px rgba(0,0,0,0.3),0 2px 4px rgba(0,0,0,0.15)}
+@media print{.sidebar{display:none}.theme-toggle,.copy-btn{display:none!important}.layout{display:block;padding:0}.main{padding-left:0}body{background:#fff;color:#1a1a1a}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}html{scroll-behavior:auto}}
+@media(max-width:1024px){.sidebar{display:none}.layout{padding:var(--space-8) var(--space-4)}.main{padding-left:0}}
+@media(max-width:768px){html{font-size:15px}.layout{padding:var(--space-6) var(--space-4)}.metric-grid,.two-col{grid-template-columns:1fr 1fr}.key-files-grid{grid-template-columns:1fr}h1{font-size:1.75rem}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="sidebar" role="navigation" aria-label="Project sections">
+    <div class="sidebar-title">Sections</div>
+    <ul>
+      <li><a href="#tech-stack" class="active">Tech Stack</a></li>
+      <li><a href="#directory">Directory</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#data-flow">Data Flow</a></li>
+      <li><a href="#key-files">Key Files</a></li>
+      <li><a href="#dependencies">Dependencies</a></li>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#env-vars">Environment</a></li>
+      <li><a href="#api">API Endpoints</a></li>
+      <li><a href="#decisions">Decisions</a></li>
+      <li><a href="#testing">Testing</a></li>
+      <li><a href="#deployment">Deployment</a></li>
+      <li><a href="#git-activity">Git Activity</a></li>
+      <li><a href="#active-files">Active Files</a></li>
+      <li><a href="#reading-path">Reading Path</a></li>
+    </ul>
+  </nav>
+
+  <article class="main">
+
+  <!-- L1: Header -->
+  <div class="header">
+    <h1>TaskFlow API</h1>
+    <p class="header-desc">A RESTful task management API with real-time WebSocket notifications, role-based access control, and multi-tenant workspace isolation. Built for teams that need more than a to-do list.</p>
+    <div class="header-tags">
+      <span class="badge badge-accent">TypeScript</span>
+      <span class="badge badge-accent">Node.js</span>
+      <span class="badge badge-accent">Express</span>
+      <span class="badge badge-accent">PostgreSQL</span>
+      <span class="badge badge-accent">Prisma</span>
+      <span class="badge badge-accent">Redis</span>
+      <span class="badge badge-accent">WebSocket</span>
+      <span class="badge badge-success">MIT</span>
+    </div>
+  </div>
+
+  <!-- L1: Overview Metrics -->
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total Files</div><div class="metric-value">187</div></div>
+    <div class="metric-card"><div class="metric-label">Primary Language</div><div class="metric-value">TS</div><div class="metric-unit">78% TypeScript</div></div>
+    <div class="metric-card"><div class="metric-label">Modules</div><div class="metric-value">4</div><div class="metric-unit">auth · tasks · ws · shared</div></div>
+    <div class="metric-card"><div class="metric-label">Last Commit</div><div class="metric-value">2h</div><div class="metric-unit">ago · 142 total</div></div>
+  </div>
+
+  <!-- L2: Tech Stack -->
+  <h2 id="tech-stack" class="section-anchor">Tech Stack</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Category</th><th>Technology</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Runtime</strong></td><td>Node.js</td><td>20.x</td><td>JavaScript runtime</td></tr>
+        <tr><td><strong>Language</strong></td><td>TypeScript</td><td>5.4</td><td>Static typing</td></tr>
+        <tr><td><strong>Framework</strong></td><td>Express</td><td>4.19</td><td>HTTP server & routing</td></tr>
+        <tr><td><strong>Database</strong></td><td>PostgreSQL</td><td>16</td><td>Primary data store</td></tr>
+        <tr><td><strong>ORM</strong></td><td>Prisma</td><td>5.14</td><td>Database access & migrations</td></tr>
+        <tr><td><strong>Cache</strong></td><td>Redis</td><td>7</td><td>Session store & rate limiting</td></tr>
+        <tr><td><strong>Realtime</strong></td><td>ws</td><td>8.17</td><td>WebSocket notifications</td></tr>
+        <tr><td><strong>Auth</strong></td><td>jsonwebtoken</td><td>9.0</td><td>JWT token issuance</td></tr>
+        <tr><td><strong>Testing</strong></td><td>Vitest</td><td>1.6</td><td>Unit & integration tests</td></tr>
+        <tr><td><strong>Lint</strong></td><td>ESLint</td><td>9.x</td><td>Code quality</td></tr>
+        <tr><td><strong>Container</strong></td><td>Docker</td><td>—</td><td>Development & deployment</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- L2: Directory Structure -->
+  <h2 id="directory" class="section-anchor">Directory Structure</h2>
+  <div class="card">
+    <div class="tree">
+      <details open>
+        <summary><span class="folder-name">taskflow-api/</span><span class="dir-purpose">Project root</span></summary>
+        <div class="indent">
+          <div class="file"><span class="dot dot-doc"></span>README.md</div>
+          <div class="file"><span class="dot dot-config"></span>package.json</div>
+          <div class="file"><span class="dot dot-config"></span>tsconfig.json</div>
+          <div class="file"><span class="dot dot-config"></span>docker-compose.yml</div>
+          <div class="file"><span class="dot dot-config"></span>.env.example</div>
+          <details open>
+            <summary><span class="folder-name">src/</span><span class="dir-purpose">Application source code</span></summary>
+            <div class="indent">
+              <div class="file"><span class="dot dot-source"></span>index.ts <span class="dir-purpose">— entry point, server bootstrap</span></div>
+              <div class="file"><span class="dot dot-source"></span>app.ts <span class="dir-purpose">— Express app factory</span></div>
+              <details open>
+                <summary><span class="folder-name">modules/</span><span class="dir-purpose">Feature modules (domain-driven)</span></summary>
+                <div class="indent">
+                  <details><summary><span class="folder-name">auth/</span><span class="dir-purpose">Authentication & authorization</span></summary>
+                    <div class="indent">
+                      <div class="file"><span class="dot dot-source"></span>auth.controller.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>auth.service.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>auth.middleware.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>auth.routes.ts</div>
+                    </div>
+                  </details>
+                  <details><summary><span class="folder-name">tasks/</span><span class="dir-purpose">Task CRUD & assignment</span></summary>
+                    <div class="indent">
+                      <div class="file"><span class="dot dot-source"></span>tasks.controller.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>tasks.service.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>tasks.routes.ts</div>
+                    </div>
+                  </details>
+                  <details><summary><span class="folder-name">workspaces/</span><span class="dir-purpose">Multi-tenant workspace management</span></summary>
+                    <div class="indent">
+                      <div class="file"><span class="dot dot-source"></span>workspaces.controller.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>workspaces.service.ts</div>
+                    </div>
+                  </details>
+                  <details><summary><span class="folder-name">notifications/</span><span class="dir-purpose">WebSocket realtime events</span></summary>
+                    <div class="indent">
+                      <div class="file"><span class="dot dot-source"></span>ws.gateway.ts</div>
+                      <div class="file"><span class="dot dot-source"></span>ws.handler.ts</div>
+                    </div>
+                  </details>
+                </div>
+              </details>
+              <details><summary><span class="folder-name">shared/</span><span class="dir-purpose">Cross-cutting concerns</span></summary>
+                <div class="indent">
+                  <div class="file"><span class="dot dot-source"></span>logger.ts <span class="dir-purpose">— structured logging (pino)</span></div>
+                  <div class="file"><span class="dot dot-source"></span>errors.ts <span class="dir-purpose">— error classes & handler</span></div>
+                  <div class="file"><span class="dot dot-source"></span>prisma.ts <span class="dir-purpose">— Prisma client singleton</span></div>
+                  <div class="file"><span class="dot dot-source"></span>redis.ts <span class="dir-purpose">— Redis client singleton</span></div>
+                </div>
+              </details>
+              <details><summary><span class="folder-name">middleware/</span><span class="dir-purpose">Express middleware stack</span></summary>
+                <div class="indent">
+                  <div class="file"><span class="dot dot-source"></span>rateLimiter.ts</div>
+                  <div class="file"><span class="dot dot-source"></span>tenantResolver.ts</div>
+                  <div class="file"><span class="dot dot-source"></span>errorHandler.ts</div>
+                </div>
+              </details>
+            </div>
+          </details>
+          <details><summary><span class="folder-name">prisma/</span><span class="dir-purpose">Database schema & migrations</span></summary>
+            <div class="indent">
+              <div class="file"><span class="dot dot-config"></span>schema.prisma <span class="dir-purpose">— data models</span></div>
+              <div class="file"><span class="dot dot-config"></span>migrations/ <span class="dir-purpose">— 12 migrations</span></div>
+            </div>
+          </details>
+          <details><summary><span class="folder-name">tests/</span><span class="dir-purpose">Test suites</span></summary>
+            <div class="indent">
+              <div class="file"><span class="dot dot-test"></span>auth.test.ts</div>
+              <div class="file"><span class="dot dot-test"></span>tasks.test.ts</div>
+              <div class="file"><span class="dot dot-test"></span>workspaces.test.ts</div>
+              <div class="file"><span class="dot dot-test"></span>helpers/</div>
+            </div>
+          </details>
+          <div class="file"><span class="dot dot-config"></span>Dockerfile</div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- L2: Architecture -->
+  <h2 id="architecture" class="section-anchor">Architecture Overview</h2>
+  <div class="card">
+    <div class="arch-wrap">
+      <svg viewBox="0 0 700 340" style="max-width:700px">
+        <!-- Client -->
+        <rect x="270" y="10" width="160" height="44" rx="8" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="350" y="37" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">Client (Browser/App)</text>
+
+        <!-- Arrow -->
+        <line x1="350" y1="54" x2="350" y2="80" stroke="var(--text-muted)" stroke-width="1.2" marker-end="url(#arrowhead)"/>
+        <text x="365" y="72" font-size="9" fill="var(--text-muted)" font-family="var(--font-mono)">HTTP/WS</text>
+
+        <!-- Express -->
+        <rect x="230" y="82" width="240" height="56" rx="10" fill="var(--bg-card-solid)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="350" y="104" text-anchor="middle" font-size="13" font-weight="600" fill="var(--text-heading)" font-family="var(--font-body)">Express Server</text>
+        <text x="350" y="120" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="var(--font-mono)">src/app.ts + middleware/</text>
+
+        <!-- Modules row -->
+        <rect x="30" y="175" width="140" height="48" rx="8" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="100" y="196" text-anchor="middle" font-size="12" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">Auth Module</text>
+        <text x="100" y="211" text-anchor="middle" font-size="9" fill="var(--text-muted)" font-family="var(--font-mono)">modules/auth/</text>
+
+        <rect x="190" y="175" width="140" height="48" rx="8" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="260" y="196" text-anchor="middle" font-size="12" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">Tasks Module</text>
+        <text x="260" y="211" text-anchor="middle" font-size="9" fill="var(--text-muted)" font-family="var(--font-mono)">modules/tasks/</text>
+
+        <rect x="350" y="175" width="150" height="48" rx="8" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="425" y="196" text-anchor="middle" font-size="12" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">Workspaces</text>
+        <text x="425" y="211" text-anchor="middle" font-size="9" fill="var(--text-muted)" font-family="var(--font-mono)">modules/workspaces/</text>
+
+        <rect x="520" y="175" width="150" height="48" rx="8" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="595" y="196" text-anchor="middle" font-size="12" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">Notifications</text>
+        <text x="595" y="211" text-anchor="middle" font-size="9" fill="var(--text-muted)" font-family="var(--font-mono)">modules/notifications/</text>
+
+        <!-- Arrows: Express → Modules -->
+        <line x1="290" y1="138" x2="100" y2="175" stroke="var(--border-focus)" stroke-width="1"/>
+        <line x1="320" y1="138" x2="260" y2="175" stroke="var(--border-focus)" stroke-width="1"/>
+        <line x1="380" y1="138" x2="425" y2="175" stroke="var(--border-focus)" stroke-width="1"/>
+        <line x1="410" y1="138" x2="595" y2="175" stroke="var(--border-focus)" stroke-width="1"/>
+
+        <!-- Data layer -->
+        <rect x="130" y="268" width="180" height="50" rx="10" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="220" y="290" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">PostgreSQL</text>
+        <text x="220" y="306" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="var(--font-mono)">via Prisma ORM</text>
+
+        <rect x="370" y="268" width="180" height="50" rx="10" fill="var(--bg-card-solid)" stroke="var(--border)" stroke-width="1.5"/>
+        <text x="460" y="290" text-anchor="middle" font-size="13" font-weight="500" fill="var(--text-heading)" font-family="var(--font-body)">Redis</text>
+        <text x="460" y="306" text-anchor="middle" font-size="10" fill="var(--text-muted)" font-family="var(--font-mono)">sessions + rate limits</text>
+
+        <!-- Arrows: Modules → Data -->
+        <line x1="170" y1="223" x2="200" y2="268" stroke="var(--border-focus)" stroke-width="1"/>
+        <line x1="260" y1="223" x2="220" y2="268" stroke="var(--border-focus)" stroke-width="1"/>
+        <line x1="425" y1="223" x2="260" y2="268" stroke="var(--border-focus)" stroke-width="1"/>
+        <line x1="595" y1="223" x2="460" y2="268" stroke="var(--border-focus)" stroke-width="1" stroke-dasharray="4"/>
+
+        <defs><marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--text-muted)"/></marker></defs>
+      </svg>
+    </div>
+  </div>
+
+  <!-- L3: Data Flow -->
+  <h2 id="data-flow" class="section-anchor">Core Data Flow</h2>
+  <div class="card">
+    <h4 style="margin-top:0">Task Creation Request Lifecycle</h4>
+    <div class="flow-diagram">
+      <div class="flow-step"><div class="flow-step-name">Client</div><div class="flow-step-file">POST /api/tasks</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Rate Limiter</div><div class="flow-step-file">middleware/rateLimiter.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Tenant Resolver</div><div class="flow-step-file">middleware/tenantResolver.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Auth Guard</div><div class="flow-step-file">modules/auth/auth.middleware.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Router</div><div class="flow-step-file">modules/tasks/tasks.routes.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Controller</div><div class="flow-step-file">modules/tasks/tasks.controller.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Service</div><div class="flow-step-file">modules/tasks/tasks.service.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name">Prisma</div><div class="flow-step-file">shared/prisma.ts</div></div>
+      <span class="flow-arrow">→</span>
+      <div class="flow-step"><div class="flow-step-name" style="color:var(--success)">PostgreSQL</div><div class="flow-step-file">INSERT INTO tasks</div></div>
+    </div>
+    <p style="font-size:.8125rem;color:var(--text-muted);margin:var(--space-3) 0 0">After write: WebSocket gateway broadcasts <code>task:created</code> event to workspace members via <code>modules/notifications/ws.gateway.ts</code></p>
+  </div>
+
+  <!-- L3: Key Files -->
+  <h2 id="key-files" class="section-anchor">Key Files</h2>
+  <div class="key-files-grid">
+    <div class="key-file">
+      <div class="key-file-path">src/index.ts</div>
+      <div class="key-file-purpose">Server entry point — boots Express, connects DB & Redis, starts listening</div>
+      <div class="key-file-why">Start here to understand how the application initializes</div>
+      <div class="key-file-exports">Exports: startServer()</div>
+    </div>
+    <div class="key-file">
+      <div class="key-file-path">src/app.ts</div>
+      <div class="key-file-purpose">Express app factory — registers middleware stack and mounts all routes</div>
+      <div class="key-file-why">The middleware order here defines the entire request pipeline</div>
+      <div class="key-file-exports">Exports: createApp()</div>
+    </div>
+    <div class="key-file">
+      <div class="key-file-path">prisma/schema.prisma</div>
+      <div class="key-file-purpose">Database schema — defines User, Task, Workspace, Membership models</div>
+      <div class="key-file-why">The data model is the foundation; everything flows from these tables</div>
+      <div class="key-file-exports">Models: User · Task · Workspace · Membership · AuditLog</div>
+    </div>
+    <div class="key-file">
+      <div class="key-file-path">modules/auth/auth.service.ts</div>
+      <div class="key-file-purpose">JWT issuance, password hashing (bcrypt), token refresh logic</div>
+      <div class="key-file-why">Every authenticated request passes through here</div>
+      <div class="key-file-exports">Exports: login() · register() · refreshToken() · verify()</div>
+    </div>
+    <div class="key-file">
+      <div class="key-file-path">middleware/tenantResolver.ts</div>
+      <div class="key-file-purpose">Extracts workspace ID from request, enforces tenant isolation</div>
+      <div class="key-file-why">Multi-tenancy is a core architectural concern; this is where it's enforced</div>
+      <div class="key-file-exports">Exports: tenantResolver middleware</div>
+    </div>
+    <div class="key-file">
+      <div class="key-file-path">modules/notifications/ws.gateway.ts</div>
+      <div class="key-file-purpose">WebSocket server — manages connections, room-based broadcast per workspace</div>
+      <div class="key-file-why">Real-time notifications are the key differentiator; this is the hub</div>
+      <div class="key-file-exports">Exports: WsGateway class · broadcast() · joinRoom()</div>
+    </div>
+  </div>
+
+  <!-- L3: External Dependencies -->
+  <h2 id="dependencies" class="section-anchor">External Dependencies</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Package</th><th>Version</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>express</code></td><td>4.19</td><td>HTTP framework</td></tr>
+        <tr><td><code>@prisma/client</code></td><td>5.14</td><td>Type-safe database client</td></tr>
+        <tr><td><code>ioredis</code></td><td>5.4</td><td>Redis client for sessions & caching</td></tr>
+        <tr><td><code>ws</code></td><td>8.17</td><td>WebSocket server</td></tr>
+        <tr><td><code>jsonwebtoken</code></td><td>9.0</td><td>JWT sign & verify</td></tr>
+        <tr><td><code>bcryptjs</code></td><td>2.4</td><td>Password hashing</td></tr>
+        <tr><td><code>zod</code></td><td>3.23</td><td>Request validation schemas</td></tr>
+        <tr><td><code>pino</code></td><td>9.2</td><td>Structured JSON logging</td></tr>
+        <tr><td><code>helmet</code></td><td>7.1</td><td>Security headers</td></tr>
+        <tr><td><code>cors</code></td><td>2.8</td><td>CORS configuration</td></tr>
+        <tr><td><code>rate-limiter-flexible</code></td><td>5.0</td><td>Token bucket rate limiting</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- L4: Getting Started -->
+  <h2 id="getting-started" class="section-anchor">Getting Started</h2>
+  <div class="card">
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Prerequisites:</strong> Node.js ≥ 20, Docker, pnpm</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Install:</strong> <code>pnpm install</code></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Start services:</strong> <code>docker compose up -d</code> (PostgreSQL + Redis)</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Configure:</strong> <code>cp .env.example .env</code> (see Environment Variables below)</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Migrate:</strong> <code>pnpm prisma migrate dev</code></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Start:</strong> <code>pnpm dev</code> → server at <code>http://localhost:3000</code></div></div>
+      <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Verify:</strong> <code>curl http://localhost:3000/health</code> → <code>{"status":"ok"}</code></div></div>
+    </div>
+  </div>
+
+  <!-- L4: Environment Variables -->
+  <h2 id="env-vars" class="section-anchor">Environment Variables</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Variable</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>DATABASE_URL</code></td><td><span class="req-yes">Yes</span></td><td>—</td><td>PostgreSQL connection string</td></tr>
+        <tr><td><code>REDIS_URL</code></td><td><span class="req-yes">Yes</span></td><td>—</td><td>Redis connection string</td></tr>
+        <tr><td><code>JWT_SECRET</code></td><td><span class="req-yes">Yes</span></td><td>—</td><td>Secret for JWT signing</td></tr>
+        <tr><td><code>PORT</code></td><td><span class="req-no">No</span></td><td>3000</td><td>HTTP server port</td></tr>
+        <tr><td><code>LOG_LEVEL</code></td><td><span class="req-no">No</span></td><td>info</td><td>Pino log level</td></tr>
+        <tr><td><code>RATE_LIMIT_MAX</code></td><td><span class="req-no">No</span></td><td>100</td><td>Max requests per window</td></tr>
+        <tr><td><code>CORS_ORIGIN</code></td><td><span class="req-no">No</span></td><td>*</td><td>Allowed CORS origins</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- L4: API Endpoints -->
+  <h2 id="api" class="section-anchor">API Endpoints</h2>
+  <div class="card">
+    <table>
+      <thead><tr><th>Method</th><th>Path</th><th>Description</th><th>Auth</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST</code></td><td><code>/api/auth/register</code></td><td>Create account</td><td>—</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/auth/login</code></td><td>Get JWT token</td><td>—</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/auth/refresh</code></td><td>Refresh token</td><td>Refresh</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/workspaces</code></td><td>List user's workspaces</td><td>JWT</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/workspaces</code></td><td>Create workspace</td><td>JWT</td></tr>
+        <tr><td><code>GET</code></td><td><code>/api/tasks</code></td><td>List tasks (filtered)</td><td>JWT + Tenant</td></tr>
+        <tr><td><code>POST</code></td><td><code>/api/tasks</code></td><td>Create task</td><td>JWT + Tenant</td></tr>
+        <tr><td><code>PATCH</code></td><td><code>/api/tasks/:id</code></td><td>Update task</td><td>JWT + Tenant</td></tr>
+        <tr><td><code>DELETE</code></td><td><code>/api/tasks/:id</code></td><td>Delete task</td><td>JWT + Tenant</td></tr>
+        <tr><td><code>WS</code></td><td><code>/ws</code></td><td>Realtime notifications</td><td>JWT (query)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- L5: Design Decisions -->
+  <h2 id="decisions" class="section-anchor">Design Decisions</h2>
+  <div class="decision-card">
+    <div class="decision-why">Module-based architecture (not flat routes)</div>
+    <div class="decision-why">Each feature (auth, tasks, workspaces) is self-contained with its own controller, service, and routes. This allows teams to work independently and makes testing easier.</div>
+    <div class="decision-tradeoff">Tradeoff: more boilerplate per module, slightly harder to see the full route table at a glance.</div>
+  </div>
+  <div class="decision-card">
+    <div class="decision-why">Prisma ORM (not raw SQL or TypeORM)</div>
+    <div class="decision-why">Type-safe queries with auto-generated client. Migration system is declarative. Developer experience prioritized over query optimization flexibility.</div>
+    <div class="decision-tradeoff">Tradeoff: complex queries require raw SQL via <code>$queryRaw</code>. Slight runtime overhead vs raw pg driver.</div>
+  </div>
+  <div class="decision-card">
+    <div class="decision-why">JWT + Redis for auth (not session-only)</div>
+    <div class="decision-why">JWTs allow stateless verification at the API gateway level. Redis stores refresh tokens and enables instant revocation (logout, password change).</div>
+    <div class="decision-tradeoff">Tradeoff: more infrastructure (Redis required). Token size adds ~500 bytes per request header.</div>
+  </div>
+
+  <!-- L5: Testing -->
+  <h2 id="testing" class="section-anchor">Testing</h2>
+  <div class="two-col">
+    <div class="card">
+      <h4 style="margin-top:0">Test Structure</h4>
+      <table>
+        <tbody>
+          <tr><td><strong>Framework</strong></td><td>Vitest 1.6</td></tr>
+          <tr><td><strong>Pattern</strong></td><td>Integration tests with real DB</td></tr>
+          <tr><td><strong>Test DB</strong></td><td>Docker PostgreSQL (test container)</td></tr>
+          <tr><td><strong>Coverage</strong></td><td>v8 provider, 74% line coverage</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Commands</h4>
+      <table>
+        <tbody>
+          <tr><td><code>pnpm test</code></td><td>Run all tests</td></tr>
+          <tr><td><code>pnpm test:watch</code></td><td>Watch mode</td></tr>
+          <tr><td><code>pnpm test:coverage</code></td><td>With coverage report</td></tr>
+          <tr><td><code>pnpm test:auth</code></td><td>Auth module only</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- L5: Deployment -->
+  <h2 id="deployment" class="section-anchor">Deployment</h2>
+  <div class="card">
+    <table>
+      <tbody>
+        <tr><td><strong>CI/CD</strong></td><td>GitHub Actions (<code>.github/workflows/ci.yml</code>)</td></tr>
+        <tr><td><strong>Pipeline</strong></td><td>lint → typecheck → test → build → docker push → deploy</td></tr>
+        <tr><td><strong>Platform</strong></td><td>Docker → AWS ECS (Fargate)</td></tr>
+        <tr><td><strong>Database</strong></td><td>AWS RDS PostgreSQL 16</td></tr>
+        <tr><td><strong>Cache</strong></td><td>AWS ElastiCache Redis 7</td></tr>
+        <tr><td><strong>Build</strong></td><td><code>docker build -t taskflow-api .</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- L6: Git Activity -->
+  <h2 id="git-activity" class="section-anchor">Git Activity</h2>
+  <div class="two-col">
+    <div class="card">
+      <h4 style="margin-top:0">Commit Frequency (Last 30 Days)</h4>
+      <div class="git-bars">
+        <div class="git-bar" style="height:20%"></div><div class="git-bar" style="height:35%"></div>
+        <div class="git-bar" style="height:15%"></div><div class="git-bar" style="height:0%"></div>
+        <div class="git-bar" style="height:50%"></div><div class="git-bar" style="height:80%"></div>
+        <div class="git-bar" style="height:100%"></div><div class="git-bar" style="height:65%"></div>
+        <div class="git-bar" style="height:45%"></div><div class="git-bar" style="height:30%"></div>
+        <div class="git-bar" style="height:10%"></div><div class="git-bar" style="height:0%"></div>
+        <div class="git-bar" style="height:55%"></div><div class="git-bar" style="height:70%"></div>
+        <div class="git-bar" style="height:40%"></div>
+      </div>
+      <p style="font-size:.75rem;color:var(--text-muted);margin:.5rem 0 0">Peak: May 8–9 (WebSocket feature + Prisma migration)</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Recent Commits</h4>
+      <table>
+        <tbody>
+          <tr><td><code style="font-size:.75rem">a3f2c1d</code></td><td>fix: rate limiter Redis connection pool leak</td></tr>
+          <tr><td><code style="font-size:.75rem">b8e1a04</code></td><td>feat: workspace invitation email template</td></tr>
+          <tr><td><code style="font-size:.75rem">c5d9f2b</code></td><td>refactor: extract tenant middleware</td></tr>
+          <tr><td><code style="font-size:.75rem">d2a7e8c</code></td><td>test: add integration tests for task assignment</td></tr>
+          <tr><td><code style="font-size:.75rem">e9f3b1a</code></td><td>fix: WebSocket auth token expiry handling</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- L6: Active Files -->
+  <h2 id="active-files" class="section-anchor">Most Active Files</h2>
+  <div class="card">
+    <div class="heatmap-row"><div class="heatmap-file">modules/tasks/tasks.service.ts</div><div class="heatmap-bar-wrap"><div class="heatmap-bar high"></div></div><div class="heatmap-count">23</div></div>
+    <div class="heatmap-row"><div class="heatmap-file">modules/notifications/ws.gateway.ts</div><div class="heatmap-bar-wrap"><div class="heatmap-bar high"></div></div><div class="heatmap-count">18</div></div>
+    <div class="heatmap-row"><div class="heatmap-file">prisma/schema.prisma</div><div class="heatmap-bar-wrap"><div class="heatmap-bar med"></div></div><div class="heatmap-count">12</div></div>
+    <div class="heatmap-row"><div class="heatmap-file">middleware/tenantResolver.ts</div><div class="heatmap-bar-wrap"><div class="heatmap-bar med"></div></div><div class="heatmap-count">9</div></div>
+    <div class="heatmap-row"><div class="heatmap-file">modules/auth/auth.service.ts</div><div class="heatmap-bar-wrap"><div class="heatmap-bar med"></div></div><div class="heatmap-count">8</div></div>
+    <div class="heatmap-row"><div class="heatmap-file">tests/tasks.test.ts</div><div class="heatmap-bar-wrap"><div class="heatmap-bar low"></div></div><div class="heatmap-count">6</div></div>
+    <div class="heatmap-row"><div class="heatmap-file">src/app.ts</div><div class="heatmap-bar-wrap"><div class="heatmap-bar low"></div></div><div class="heatmap-count">4</div></div>
+  </div>
+
+  <!-- Footer: Reading Path -->
+  <h2 id="reading-path" class="section-anchor">Recommended Reading Path</h2>
+  <div class="card">
+    <p style="color:var(--text-secondary);font-size:.9375rem;margin-bottom:var(--space-4)">New to this project? Read these files in order:</p>
+    <div class="reading-step"><div class="reading-num">1</div><div><div class="reading-file">README.md</div><div class="reading-why">Project overview, setup instructions, and API documentation</div></div></div>
+    <div class="reading-step"><div class="reading-num">2</div><div><div class="reading-file">.env.example</div><div class="reading-why">All configuration options — set up your environment first</div></div></div>
+    <div class="reading-step"><div class="reading-num">3</div><div><div class="reading-file">prisma/schema.prisma</div><div class="reading-why">Data model is the foundation — understand the tables before the code</div></div></div>
+    <div class="reading-step"><div class="reading-num">4</div><div><div class="reading-file">src/index.ts</div><div class="reading-why">Entry point — see how the server boots and what it connects to</div></div></div>
+    <div class="reading-step"><div class="reading-num">5</div><div><div class="reading-file">src/app.ts</div><div class="reading-why">Middleware stack order — this defines the entire request pipeline</div></div></div>
+    <div class="reading-step"><div class="reading-num">6</div><div><div class="reading-file">middleware/tenantResolver.ts</div><div class="reading-why">Multi-tenancy is enforced here — critical for understanding data isolation</div></div></div>
+    <div class="reading-step"><div class="reading-num">7</div><div><div class="reading-file">modules/auth/auth.service.ts</div><div class="reading-why">Auth is the gateway — every request depends on this</div></div></div>
+    <div class="reading-step"><div class="reading-num">8</div><div><div class="reading-file">modules/tasks/tasks.service.ts</div><div class="reading-why">Core business logic — the most active file in the project</div></div></div>
+  </div>
+
+  <!-- Footer: Coverage -->
+  <div class="card" style="margin-top:var(--space-4)">
+    <h4 style="margin-top:0">Scan Coverage</h4>
+    <div class="coverage">
+      <div class="coverage-item"><span>187</span> files scanned</div>
+      <div class="coverage-item"><span>34</span> skipped</div>
+      <div class="coverage-item"><span>85%</span> coverage</div>
+      <div class="coverage-item muted">Phase: A + B + C</div>
+      <div class="coverage-item muted">Generated: 2026-05-13</div>
+    </div>
+  </div>
+
+  </article>
+
+</div>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+  <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+
+<script>
+(function(){
+  /* Theme */
+  var h=document.documentElement,s=localStorage.getItem('theme');
+  if(s==='dark')h.classList.add('dark-mode');else if(s==='light')h.classList.add('light-mode');
+  else if(window.matchMedia('(prefers-color-scheme:dark)').matches)h.classList.add('dark-default');
+  document.getElementById('themeToggle').addEventListener('click',function(){
+    var d=h.classList.contains('dark-mode')||(h.classList.contains('dark-default')&&!h.classList.contains('light-mode'));
+    h.classList.remove('dark-mode','light-mode','dark-default');
+    if(d){h.classList.add('light-mode');localStorage.setItem('theme','light')}
+    else{h.classList.add('dark-mode');localStorage.setItem('theme','dark')}
+  });
+
+  /* Sidebar */
+  var links=document.querySelectorAll('.sidebar a'),ids=[];
+  links.forEach(function(l){ids.push({id:l.getAttribute('href').slice(1),link:l})});
+  function update(){
+    var y=window.pageYOffset||document.documentElement.scrollTop,v=window.innerHeight,doc=document.documentElement.scrollHeight,bot=y+v>=doc-50,cur=null;
+    if(bot)cur=ids[ids.length-1];
+    else{for(var i=ids.length-1;i>=0;i--){var el=document.getElementById(ids[i].id);if(el&&el.getBoundingClientRect().top<=120){cur=ids[i];break}}if(!cur&&ids.length)cur=ids[0]}
+    links.forEach(function(l){l.classList.remove('active')});if(cur)cur.link.classList.add('active')
+  }
+  function glow(id){var el=document.getElementById(id);if(!el)return;el.classList.remove('section-glow');void el.offsetWidth;el.classList.add('section-glow');setTimeout(function(){el.classList.remove('section-glow')},1500)}
+  links.forEach(function(l){l.addEventListener('click',function(e){
+    e.preventDefault();var id=l.getAttribute('href').slice(1),t=document.getElementById(id);
+    links.forEach(function(x){x.classList.remove('active')});l.classList.add('active');
+    if(t){t.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(function(){glow(id)},350)}
+  })});
+  var prev=null;function onScroll(){update();var a=null;links.forEach(function(l){if(l.classList.contains('active'))a=l});
+    if(a){var c=a.getAttribute('href').slice(1);if(prev!==null&&c!==prev)glow(c);prev=c}}
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',update,{passive:true});
+  setTimeout(update,300);update();
+
+  /* Copy buttons */
+  var ci='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  var ck='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+  document.querySelectorAll('pre').forEach(function(p){
+    var b=document.createElement('button');b.className='copy-btn';b.innerHTML=ci+'Copy';
+    b.addEventListener('click',function(){var c=p.querySelector('code'),t=c?c.textContent:p.textContent;
+      navigator.clipboard.writeText(t).then(function(){b.innerHTML=ck+'Copied';b.classList.add('copied');
+        setTimeout(function(){b.innerHTML=ci+'Copy';b.classList.remove('copied')},2000)})});
+    p.appendChild(b)
+  });
+})();
+</script>
+</body>
+</html>

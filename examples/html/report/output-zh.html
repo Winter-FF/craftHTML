@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技术团队周报 — 2026年第19周</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   Design Tokens — craftHTML
+   ============================================ */
+:root {
+  --bg-page: #FAF8F5;
+  --bg-surface: #F5F2ED;
+  --bg-card: #FFFFFF08;
+  --bg-card-solid: #F7F5F0;
+  --bg-code: #F5F2ED;
+  --border: #E8E4DC;
+  --border-subtle: #EDE9E2;
+  --border-focus: #C8C2B8;
+  --text-primary: #3A3A3A;
+  --text-heading: #1A1A1A;
+  --text-secondary: #6B6B6B;
+  --text-muted: #8A8780;
+  --accent: #8B7B68;
+  --accent-subtle: #8B7B6812;
+  --accent-hover: #75674F;
+  --success: #6B8E5A;
+  --success-subtle: #6B8E5A12;
+  --warning: #C4956A;
+  --warning-subtle: #C4956A12;
+  --danger: #B85C5C;
+  --danger-subtle: #B85C5C12;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03);
+
+  --font-heading: "Noto Serif SC", Georgia, "Times New Roman", serif;
+  --font-body: "Noto Sans SC", "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", Consolas, monospace;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 180ms;
+  --duration-normal: 300ms;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 9999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  scroll-padding-top: 2rem;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  line-height: 1.8;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   Layout
+   ============================================ */
+.layout {
+  display: flex;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-12) var(--space-12) var(--space-8);
+  gap: 0;
+}
+
+.main {
+  flex: 1;
+  max-width: 780px;
+  min-width: 0;
+  padding-left: var(--space-12);
+}
+
+/* ============================================
+   Sidebar
+   ============================================ */
+.sidebar {
+  position: sticky;
+  top: 3rem;
+  width: 240px;
+  flex-shrink: 0;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  padding: var(--space-8) var(--space-8) var(--space-8) 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.sidebar::-webkit-scrollbar { width: 0; display: none; }
+
+.sidebar-title {
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  padding-left: 0.875rem;
+}
+
+.sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
+.sidebar li { margin: 0; }
+
+.sidebar a {
+  display: block;
+  padding: 0.4375rem 0.875rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition: color var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
+  position: relative;
+}
+
+.sidebar a:hover { color: var(--text-primary); background: var(--accent-subtle); }
+
+.sidebar a.active {
+  color: var(--text-heading);
+  font-weight: 500;
+  background: var(--accent-subtle);
+}
+
+.sidebar a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--accent);
+  border-radius: var(--radius-pill);
+}
+
+/* ============================================
+   Typography — CJK optimized
+   ============================================ */
+h1, h2, h3, h4 { color: var(--text-heading); line-height: 1.35; }
+
+h1 {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin: 0 0 var(--space-8);
+}
+
+h2 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin-top: var(--space-12);
+  margin-bottom: var(--space-4);
+}
+
+h3 {
+  font-family: var(--font-body);
+  font-size: 1.1875rem;
+  font-weight: 500;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
+}
+
+h4 {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+p { margin-bottom: var(--space-4); }
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+a:hover { color: var(--accent-hover); border-bottom-color: var(--accent); }
+strong { font-weight: 600; color: var(--text-heading); }
+
+/* ============================================
+   Meta
+   ============================================ */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) 2.5rem;
+  margin-bottom: var(--space-12);
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
+.meta-label { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); }
+.meta-value { font-size: 0.875rem; color: var(--text-primary); font-weight: 500; }
+
+/* ============================================
+   Badges
+   ============================================ */
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.badge-accent { color: var(--accent); background: var(--accent-subtle); }
+.badge-success { color: var(--success); background: var(--success-subtle); }
+.badge-warning { color: var(--warning); background: var(--warning-subtle); }
+.badge-danger { color: var(--danger); background: var(--danger-subtle); }
+
+/* ============================================
+   Cards
+   ============================================ */
+.card {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.card:hover { box-shadow: var(--shadow-md); }
+.card-accent { border-left: 3px solid var(--accent); }
+.card h3, .card h4 { margin-top: 0; margin-bottom: 0.75rem; }
+
+/* ============================================
+   Tables
+   ============================================ */
+table { width: 100%; border-collapse: collapse; font-size: 0.875rem; margin-bottom: var(--space-8); }
+
+th {
+  font-weight: 500;
+  text-align: left;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+td { padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); color: var(--text-primary); }
+tr > * + * { padding-left: 1.25rem; }
+tr:hover td { color: var(--text-heading); }
+
+/* ============================================
+   Code
+   ============================================ */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--bg-code);
+  color: var(--text-heading);
+  padding: 0.15em 0.45em;
+  border-radius: var(--radius-sm);
+}
+
+pre {
+  background: var(--bg-code);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin-bottom: var(--space-8);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+
+pre code { background: none; padding: 0; font-size: 0.8125rem; line-height: 1.7; color: var(--text-primary); }
+
+/* ============================================
+   Lists
+   ============================================ */
+ul, ol { margin-bottom: var(--space-4); padding-left: 1.5rem; }
+li { margin-bottom: var(--space-1); }
+li::marker { color: var(--text-muted); }
+
+/* ============================================
+   Metric Grid
+   ============================================ */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.25rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-normal) var(--ease-out), transform var(--duration-normal) var(--ease-out);
+}
+
+.metric-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.metric-label { font-size: 0.75rem; font-weight: 500; color: var(--text-muted); margin-bottom: 0.5rem; }
+.metric-value { font-family: var(--font-heading); font-size: 2.25rem; font-weight: 500; color: var(--text-heading); line-height: 1.1; letter-spacing: -0.02em; }
+.metric-unit { font-size: 0.75rem; color: var(--text-secondary); font-weight: 400; }
+.metric-change { font-size: 0.75rem; font-weight: 500; margin-top: 0.35rem; }
+.metric-change.up { color: var(--success); }
+.metric-change.down { color: var(--danger); }
+.metric-change.flat { color: var(--text-muted); }
+
+/* ============================================
+   Collapsible
+   ============================================ */
+details {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+  background: var(--bg-card-solid);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+details:hover { box-shadow: var(--shadow-md); }
+details[open] { padding-bottom: 0.5rem; }
+
+summary {
+  padding: 0.875rem 1.25rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-heading);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+summary::-webkit-details-marker { display: none; }
+
+summary::before {
+  content: "";
+  display: inline-block;
+  width: 0; height: 0;
+  border-left: 4.5px solid var(--text-muted);
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  flex-shrink: 0;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+details[open] > summary::before { transform: rotate(90deg); }
+summary:hover { color: var(--accent); }
+summary:hover::before { border-left-color: var(--accent); }
+details .detail-content { padding: 0 1.25rem 0.25rem; }
+
+/* ============================================
+   Section Anchors
+   ============================================ */
+.section-anchor { scroll-margin-top: 2rem; }
+.heading-anchor { color: var(--text-heading); text-decoration: none; }
+.heading-anchor:hover { border-bottom: none; }
+.heading-anchor:hover::after { content: " #"; color: var(--border-focus); font-size: 0.8em; }
+
+/* Section highlight glow on navigate */
+h2[id], h3[id] {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+h2[id]::before, h3[id]::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+h2.section-glow::before, h3.section-glow::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+h2.section-glow, h3.section-glow {
+  color: var(--accent-hover);
+}
+
+/* ============================================
+   Status List — for task items
+   ============================================ */
+.status-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.status-item:last-child { border-bottom: none; }
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 0.45rem;
+}
+
+.status-dot.done { background: var(--success); }
+.status-dot.progress { background: var(--warning); }
+.status-dot.blocked { background: var(--danger); }
+.status-dot.planned { background: var(--border-focus); }
+
+.status-content { flex: 1; }
+.status-title { font-weight: 500; color: var(--text-heading); font-size: 0.9375rem; }
+.status-desc { font-size: 0.875rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* ============================================
+   Theme Toggle
+   ============================================ */
+.theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-card-solid);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow var(--duration-normal) var(--ease-out), border-color var(--duration-normal) var(--ease-out);
+  z-index: 100;
+  padding: 0;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.theme-toggle:hover { box-shadow: var(--shadow-lg); border-color: var(--border-focus); color: var(--text-heading); }
+.theme-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+html.dark-mode .theme-toggle .icon-sun, html.dark-default:not(.light-mode) .theme-toggle .icon-sun { display: block; }
+html.dark-mode .theme-toggle .icon-moon, html.dark-default:not(.light-mode) .theme-toggle .icon-moon { display: none; }
+
+/* ============================================
+   Copy Button
+   ============================================ */
+.copy-btn {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-solid);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+  z-index: 2;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.copy-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { color: var(--text-heading); border-color: var(--border-focus); }
+.copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+html.dark-mode,
+html.dark-default:not(.light-mode) {
+  --bg-page: #1C1C1B;
+  --bg-surface: #242423;
+  --bg-card-solid: #262625;
+  --bg-code: #222221;
+  --border: #383836;
+  --border-subtle: #30302E;
+  --border-focus: #52524E;
+  --text-primary: #D2CEC6;
+  --text-heading: #E6E2DA;
+  --text-secondary: #908C84;
+  --text-muted: #7A776F;
+  --accent: #C4AD94;
+  --accent-subtle: #C4AD9418;
+  --accent-hover: #D4BDA3;
+  --success: #8FB07A;
+  --success-subtle: #8FB07A18;
+  --warning: #D4AD7A;
+  --warning-subtle: #D4AD7A18;
+  --danger: #D08080;
+  --danger-subtle: #D0808018;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.15);
+}
+
+/* ============================================
+   Print
+   ============================================ */
+@media print {
+  .sidebar { display: none; }
+  .theme-toggle, .copy-btn { display: none !important; }
+  .layout { display: block; padding: 0; }
+  .main { max-width: 100%; padding-left: 0; }
+  body { background: white; color: #1a1a1a; font-size: 11pt; }
+  .card, details, .metric-card { box-shadow: none; border: 1px solid #ddd; background: #fafafa; break-inside: avoid; }
+  h2 { page-break-after: avoid; }
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 1024px) {
+  .sidebar { display: none; }
+  .layout { padding: var(--space-8) var(--space-4); }
+  .main { padding-left: 0; }
+}
+
+@media (max-width: 768px) {
+  html { font-size: 15px; }
+  .layout { padding: 1.5rem 1.25rem; }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.25rem; }
+  .meta { flex-direction: column; gap: 0.5rem; }
+  .metric-grid { grid-template-columns: 1fr 1fr; }
+  .card { padding: 1.25rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar" role="navigation" aria-label="文档章节">
+    <div class="sidebar-title">目录</div>
+    <ul>
+      <li><a href="#summary" class="active">本周概览</a></li>
+      <li><a href="#progress">进度详情</a></li>
+      <li><a href="#metrics">关键指标</a></li>
+      <li><a href="#issues">风险与阻塞</a></li>
+      <li><a href="#plan">下周计划</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <article class="main">
+
+    <h1>技术团队周报</h1>
+
+    <div class="meta">
+      <div class="meta-item">
+        <span class="meta-label">周期</span>
+        <span class="meta-value">2026年第19周（5.5 — 5.9）</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">团队</span>
+        <span class="meta-value">平台工程组</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">状态</span>
+        <span class="badge badge-success">正常推进</span>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="card card-accent">
+      <h4 style="margin-top: 0;">本周要点</h4>
+      <p style="margin-bottom: 0;">API 网关迁移完成 85%，核心链路已切换至新架构。用户反馈系统 v2 上线后，工单平均响应时间缩短 37%。发现 Redis 集群在高并发下的一个潜在连接泄漏问题，已提交修复 PR。</p>
+    </div>
+
+    <!-- Metrics -->
+    <div class="metric-grid" id="metrics">
+      <div class="metric-card">
+        <div class="metric-label">部署次数</div>
+        <div class="metric-value">23</div>
+        <div class="metric-change up">↑ 15% 较上周</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">服务可用性</div>
+        <div class="metric-value">99.97<span class="metric-unit">%</span></div>
+        <div class="metric-change flat">— 持平</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">P99 延迟</div>
+        <div class="metric-value">142<span class="metric-unit">ms</span></div>
+        <div class="metric-change up">↓ 8% 优化</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">未解决工单</div>
+        <div class="metric-value">7</div>
+        <div class="metric-change down">↑ 2 新增</div>
+      </div>
+    </div>
+
+    <!-- Progress Details -->
+    <h2 id="progress" class="section-anchor"><a href="#progress" class="heading-anchor">进度详情</a></h2>
+
+    <h3>API 网关迁移</h3>
+
+    <div class="status-item">
+      <div class="status-dot done"></div>
+      <div class="status-content">
+        <div class="status-title">用户认证链路切换完成</div>
+        <div class="status-desc">OAuth 2.0 + JWT 验证已全部迁移到新网关，零故障回滚演练通过。</div>
+      </div>
+    </div>
+
+    <div class="status-item">
+      <div class="status-dot done"></div>
+      <div class="status-content">
+        <div class="status-title">流量灰度比例提升至 85%</div>
+        <div class="status-desc">剩余 15% 为内部测试账号和遗留 webhook 端点，计划下周完成。</div>
+      </div>
+    </div>
+
+    <div class="status-item">
+      <div class="status-dot progress"></div>
+      <div class="status-content">
+        <div class="status-title">速率限制中间件开发中</div>
+        <div class="status-desc">滑动窗口算法实现完毕，正在做 Redis 集群的压力测试。预计下周二完成。</div>
+      </div>
+    </div>
+
+    <h3>用户反馈系统 v2</h3>
+
+    <div class="status-item">
+      <div class="status-dot done"></div>
+      <div class="status-content">
+        <div class="status-title">v2 全量上线</div>
+        <div class="status-desc">新工单分类引擎准确率 94%，自动分配覆盖 78% 的常见问题类型。</div>
+      </div>
+    </div>
+
+    <div class="status-item">
+      <div class="status-dot done"></div>
+      <div class="status-content">
+        <div class="status-title">工单响应时间从 4.2h 降至 2.6h</div>
+        <div class="status-desc">主要得益于智能路由和优先级自动排序。</div>
+      </div>
+    </div>
+
+    <h3>可观测性平台</h3>
+
+    <div class="status-item">
+      <div class="status-dot progress"></div>
+      <div class="status-content">
+        <div class="status-title">Grafana 仪表盘标准化进行中</div>
+        <div class="status-desc">已完成 12/18 个核心服务的仪表盘模板，剩余 6 个预计下周三完成。</div>
+      </div>
+    </div>
+
+    <div class="status-item">
+      <div class="status-dot blocked"></div>
+      <div class="status-content">
+        <div class="status-title">日志采集延迟问题</div>
+        <div class="status-desc">Filebeat 在高流量场景下出现 30s+ 延迟，正在与基础架构组联合排查。</div>
+      </div>
+    </div>
+
+    <!-- Risks & Blockers -->
+    <h2 id="issues" class="section-anchor"><a href="#issues" class="heading-anchor">风险与阻塞</a></h2>
+
+    <details>
+      <summary>Redis 连接泄漏（<span class="badge badge-danger">高</span>）</summary>
+      <div class="detail-content">
+        <p>在压测中发现 Redis 连接池偶发泄漏，每约 10 万次请求泄漏 1-2 个连接。根因定位为连接超时后的异常处理未正确归还连接。已提交 <a href="#">PR #2847</a>，等待 review。</p>
+        <p style="margin-bottom: 0;"><strong>影响范围：</strong>若不修复，预计在流量高峰期（QPS &gt; 8000）时连接池耗尽，导致服务降级。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Filebeat 日志采集延迟（<span class="badge badge-warning">中</span>）</summary>
+      <div class="detail-content">
+        <p>高流量场景下 Filebeat 出现 30s+ 延迟，已初步确认与磁盘 I/O 瓶颈有关。基础架构组正在评估升级 SSD 或切换到 Vector 的方案。</p>
+        <p style="margin-bottom: 0;"><strong>临时方案：</strong>已将关键服务的日志级别从 DEBUG 调整为 INFO，延迟降至 10s 以内。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>遗留 webhook 端点迁移（<span class="badge badge-accent">低</span>）</summary>
+      <div class="detail-content">
+        <p style="margin-bottom: 0;">仍有 3 个大客户的 webhook 端点未迁移到新网关。已与客户成功团队协调，计划 5 月 15 日前完成沟通，5 月 22 日前完成迁移。</p>
+      </div>
+    </details>
+
+    <!-- Next Week Plan -->
+    <h2 id="plan" class="section-anchor"><a href="#plan" class="heading-anchor">下周计划</a></h2>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>事项</th>
+            <th>负责人</th>
+            <th>预期完成</th>
+            <th>优先级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>API 网关迁移收尾（剩余 15%）</td>
+            <td>张明</td>
+            <td>周三</td>
+            <td><span class="badge badge-danger">P0</span></td>
+          </tr>
+          <tr>
+            <td>Redis 连接泄漏修复上线</td>
+            <td>李婷</td>
+            <td>周二</td>
+            <td><span class="badge badge-danger">P0</span></td>
+          </tr>
+          <tr>
+            <td>速率限制中间件压力测试</td>
+            <td>王浩</td>
+            <td>周二</td>
+            <td><span class="badge badge-warning">P1</span></td>
+          </tr>
+          <tr>
+            <td>Grafana 仪表盘模板收尾</td>
+            <td>赵雪</td>
+            <td>周三</td>
+            <td><span class="badge badge-warning">P1</span></td>
+          </tr>
+          <tr>
+            <td>遗留 webhook 客户沟通</td>
+            <td>陈立</td>
+            <td>周四</td>
+            <td><span class="badge badge-accent">P2</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </article>
+
+</div>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式" title="切换深浅色模式">
+  <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+
+<script>
+(function() {
+  /* Theme Toggle */
+  var html = document.documentElement;
+  var stored = localStorage.getItem('theme');
+
+  if (stored === 'dark') { html.classList.add('dark-mode'); }
+  else if (stored === 'light') { html.classList.add('light-mode'); }
+  else if (window.matchMedia('(prefers-color-scheme: dark)').matches) { html.classList.add('dark-default'); }
+
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    var isDark = html.classList.contains('dark-mode') ||
+      (html.classList.contains('dark-default') && !html.classList.contains('light-mode'));
+
+    html.classList.remove('dark-mode', 'light-mode', 'dark-default');
+
+    if (isDark) {
+      html.classList.add('light-mode');
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.classList.add('dark-mode');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  /* Sidebar Active State */
+  var sidebarLinks = document.querySelectorAll('.sidebar a');
+  var sectionIds = [];
+  sidebarLinks.forEach(function(link) {
+    sectionIds.push({ id: link.getAttribute('href').slice(1), link: link });
+  });
+
+  function getScrollTop() { return window.pageYOffset || document.documentElement.scrollTop; }
+
+  function updateSidebar() {
+    var scrollY = getScrollTop();
+    var viewH = window.innerHeight;
+    var docH = document.documentElement.scrollHeight;
+    var isAtBottom = scrollY + viewH >= docH - 50;
+    var current = null;
+
+    if (isAtBottom) {
+      /* At page bottom — activate last section */
+      current = sectionIds[sectionIds.length - 1];
+    } else {
+      /* Find the section currently in view */
+      for (var i = sectionIds.length - 1; i >= 0; i--) {
+        var el = document.getElementById(sectionIds[i].id);
+        if (el && el.getBoundingClientRect().top <= 120) {
+          current = sectionIds[i];
+          break;
+        }
+      }
+      if (!current && sectionIds.length > 0) current = sectionIds[0];
+    }
+
+    sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+    if (current) current.link.classList.add('active');
+  }
+
+  /* Section glow effect — accent bar slides in, holds, fades out */
+  function glowSection(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('section-glow');
+    void el.offsetWidth;
+    el.classList.add('section-glow');
+    setTimeout(function() { el.classList.remove('section-glow'); }, 1500);
+  }
+
+  /* Click: highlight sidebar + glow target */
+  sidebarLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault(); /* prevent hash change → no auto-focus → no blinking cursor */
+      var id = link.getAttribute('href').slice(1);
+      var target = document.getElementById(id);
+
+      sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+      link.classList.add('active');
+
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(function() { glowSection(id); }, 350);
+      }
+    });
+  });
+
+  /* Scroll: glow when crossing section boundaries */
+  var prevActiveId = null;
+  function onScroll() {
+    updateSidebar();
+    var active = null;
+    sidebarLinks.forEach(function(l) { if (l.classList.contains('active')) active = l; });
+    if (active) {
+      var curId = active.getAttribute('href').slice(1);
+      if (prevActiveId !== null && curId !== prevActiveId) glowSection(curId);
+      prevActiveId = curId;
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', updateSidebar, { passive: true });
+  setTimeout(updateSidebar, 300);
+  updateSidebar();
+
+  /* Copy Buttons */
+  var copyIcon = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  var checkIcon = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  document.querySelectorAll('pre').forEach(function(pre) {
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.innerHTML = copyIcon + '复制';
+    btn.setAttribute('aria-label', '复制代码');
+
+    btn.addEventListener('click', function() {
+      var code = pre.querySelector('code');
+      var text = code ? code.textContent : pre.textContent;
+
+      navigator.clipboard.writeText(text).then(function() {
+        btn.innerHTML = checkIcon + '已复制';
+        btn.classList.add('copied');
+        setTimeout(function() {
+          btn.innerHTML = copyIcon + '复制';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    pre.appendChild(btn);
+  });
+})();
+</script>
+
+</body>
+</html>
