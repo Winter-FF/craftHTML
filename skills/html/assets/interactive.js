@@ -1,3 +1,5 @@
+// SOURCE-OF-TRUTH: shared/assets/interactive.js
+
 /* ============================================
    craftHTML Interactive JavaScript
    Theme Toggle + Sidebar + Section Glow + Copy

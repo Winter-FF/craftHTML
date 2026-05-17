@@ -11,6 +11,7 @@ node_modules/
 
 # Internal docs (not part of the release)
 docs/
+winter.md
 
 # Test artifacts
 test-projects/
@@ -19,6 +20,10 @@ test-output/
 
 # Logs
 *.log
+
+# workflow
+.planning/
+.playwright-mcp
 
 # Temporary
 *.tmp
