@@ -1,0 +1,19 @@
+/* SOURCE-OF-TRUTH: shared/assets/prose.css */
+
+/* ============================================
+   craftHTML Prose Elements
+   Blockquote, hr, img, mark — basic document
+   ============================================ */
+
+/* Blockquote */
+blockquote { border-left: 3px solid var(--accent); padding: var(--space-4) var(--space-6); margin: var(--space-6) 0; background: var(--bg-surface); border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+blockquote p:last-child { margin-bottom: 0; }
+
+/* Horizontal Rule */
+hr { border: none; border-top: 1px solid var(--border); margin: var(--space-8) 0; }
+
+/* Image */
+img { max-width: 100%; height: auto; border-radius: var(--radius-md); }
+
+/* Mark / Highlight */
+mark { background: var(--accent-subtle); color: var(--accent); padding: 0.1em 0.3em; border-radius: 2px; }

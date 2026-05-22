@@ -33,6 +33,7 @@ assets/
 ├── tokens.css        → :root { } CSS variables (paste first in <style>)
 ├── layout.css        → sidebar + main layout
 ├── typography.css    → font declarations + sizing
+├── prose.css         → blockquote, hr, img, mark (basic document elements)
 ├── components.css    → cards, badges, tables, metrics, collapsible
 ├── interactive.css   → theme toggle, copy button, section glow, print, responsive
 ├── interactive.js    → all JS (theme + sidebar + glow + copy)
@@ -46,7 +47,8 @@ Assembly procedure:
 2. In `<head>`: Google Fonts link + all CSS modules combined in `<style>` tag
 3. In `<body>`: sidebar.html template + main content + theme-toggle.html template
 4. Before `</body>`: interactive.js in a `<script>` tag
-5. Verify against the checklist below
+5. If CJK output: append a `/* CJK Overrides */` block after all CSS modules (see §3)
+6. Verify against the checklist below
 
 Google Fonts — copy the link matching your script:
 - CJK: `Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Inter`
@@ -59,6 +61,14 @@ Font override for Latin scripts: after copying tokens.css, override:
 --font-body: "Inter", system-ui, sans-serif;
 ```
 CJK scripts use the defaults from tokens.css.
+
+### Assembly Discipline
+
+- **Keep module comments**: Each CSS module has a `/* ===== Name ===== */` header. Preserve them in the `<style>` tag — do NOT compress or minify CSS.
+- **CJK overrides as appended block**: When output is CJK, add overrides AFTER all CSS modules in a clearly marked `/* ===== CJK Overrides ===== */` block. Do NOT modify the original values inside the module copies.
+- **Sidebar first link active**: The first `<a>` in the sidebar MUST have `class="active"`.
+- **No custom CSS classes**: Do NOT add CSS classes not defined in `assets/`. If a standard HTML element needs styling (blockquote, hr, img, mark), it is in `prose.css`. Everything else uses browser defaults.
+- **No inline style attributes**: Do NOT use `style=""` on elements. All visual styling comes from the CSS modules.
 
 ---
 
@@ -91,9 +101,19 @@ CJK disambiguation: hiragana/katakana → ja, Hangul → ko, otherwise → zh.
 
 CJK typographic overrides (when output is CJK):
 - body line-height: 1.8 (not 1.75)
-- h1/h2 letter-spacing: +0.02em (not negative)
+- h1/h2 letter-spacing: 0.02em (not negative)
+- h3 letter-spacing: 0 (not -0.005em)
 - font-heading: Noto Serif SC/JP/KR
 - font-body: Noto Sans SC/JP/KR first
+
+CJK override block — append AFTER all CSS modules, do NOT modify original values:
+```css
+/* ===== CJK Overrides ===== */
+body { line-height: 1.8; }
+h1 { letter-spacing: 0.02em; }
+h2 { letter-spacing: 0.02em; }
+h3 { letter-spacing: 0; }
+```
 
 RTL overrides: `<html dir="rtl">`, sidebar right-aligned, mirrored margins.
 
@@ -112,10 +132,12 @@ Components:
 - NEVER add language switch/link elements (e.g., "English"/"中文" toggle) unless the user explicitly asks.
 - NEVER add header bars, top navigation bars, floating action buttons, or any element not defined in the assets/ modules.
 - NEVER add breadcrumb navigation, progress bars, or search boxes.
+- NEVER write custom CSS classes not present in assets/. Common elements (blockquote, hr, img, mark) are in `prose.css`.
+- NEVER use inline `style=""` attributes.
 - Theme toggle MUST be bottom-right (bottom: 2rem, right: 2rem). NEVER top-right or top-left.
 
 Typography enforcement:
-- CJK output MUST use: `letter-spacing: +0.02em` for h1 and h2, `line-height: 1.8` for body.
+- CJK output MUST use: `letter-spacing: 0.02em` for h1/h2, `letter-spacing: 0` for h3, `line-height: 1.8` for body.
 - CJK output MUST NOT use negative letter-spacing (the Latin defaults).
 - Detection rule: read first 20 lines of content. If >30% CJK characters → apply CJK typographic overrides.
 
@@ -155,12 +177,16 @@ Before outputting, verify:
 - [ ] No color value outside tokens?
 - [ ] Theme toggle: SVG icons (NOT emoji), bottom-right (NOT top-right)?
 - [ ] Sidebar present with h2 headings?
+- [ ] Sidebar first link has `class="active"`?
 - [ ] h2 elements borderless?
 - [ ] Copy buttons on all `<pre>` blocks?
 - [ ] Section glow: ::before pseudo-element (NOT box-shadow)?
 - [ ] Dark mode: html.dark-mode class (NOT data-theme)?
+- [ ] CJK overrides in appended block (NOT modified original values)?
 - [ ] CJK typographic overrides applied (if CJK output)?
+- [ ] No custom CSS classes or inline styles?
 - [ ] No unauthorized components (lang-switch, header-bar, top-nav, etc.)?
+- [ ] CSS modules have section comments (not compressed)?
 - [ ] Google Fonts link matches output script?
 - [ ] `<html lang="xx">` correct?
 - [ ] Print + reduced-motion styles included?

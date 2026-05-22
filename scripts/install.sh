@@ -29,7 +29,7 @@ STAR="${Y}★${RST}"
 
 SKILLS=("html" "html-map")
 MODULES=(
-  "tokens.css" "layout.css" "typography.css" "components.css"
+  "tokens.css" "layout.css" "typography.css" "prose.css" "components.css"
   "interactive.css" "interactive.js"
   "sidebar.html" "theme-toggle.html" "google-fonts.html"
 )
