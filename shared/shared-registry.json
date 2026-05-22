@@ -61,5 +61,12 @@
       { "skill": "skills/html", "path": "assets/google-fonts.html" },
       { "skill": "skills/html-map", "path": "assets/google-fonts.html" }
     ]
+  },
+  {
+    "source": "shared/assets/prose.css",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/prose.css" },
+      { "skill": "skills/html-map", "path": "assets/prose.css" }
+    ]
   }
 ]

@@ -151,9 +151,18 @@ The /html-map output must look identical to /html output. Read these files and c
 1. `skills/html/assets/tokens.css` — ALL color/spacing/shadow/radius tokens
 2. `skills/html/assets/layout.css` — sidebar + main layout
 3. `skills/html/assets/typography.css` — ALL heading styles, paragraph styles, code styles
-4. `skills/html/assets/components.css` — cards, badges, tables, metrics, collapsible
-5. `skills/html/assets/interactive.css` — section glow, copy button, theme toggle, print, responsive
-6. `skills/html/assets/interactive.js` — ALL JavaScript (theme, sidebar, glow, copy)
+4. `skills/html/assets/prose.css` — blockquote, hr, img, mark (basic document elements)
+5. `skills/html/assets/components.css` — cards, badges, tables, metrics, collapsible
+6. `skills/html/assets/interactive.css` — section glow, copy button, theme toggle, print, responsive
+7. `skills/html/assets/interactive.js` — ALL JavaScript (theme, sidebar, glow, copy)
+
+### Assembly Discipline
+
+- **Keep module comments**: Each CSS module has a `/* ===== Name ===== */` header. Preserve them in the `<style>` tag — do NOT compress or minify CSS.
+- **CJK overrides as appended block**: When output is CJK, add overrides AFTER all CSS modules in a clearly marked `/* ===== CJK Overrides ===== */` block. Do NOT modify the original values inside the module copies.
+- **Sidebar first link active**: The first `<a>` in the sidebar MUST have `class="active"`.
+- **No custom CSS classes**: Do NOT add CSS classes not defined in the asset files or the html-map specific CSS below. For html-map output, the ONLY custom classes allowed are: `.tree`, `.flow-diagram`, `.flow-step`, `.key-file`, `.key-file-path`, `.git-bars`, `.git-bar`, `.reading-step`, `.reading-num`. Everything else uses browser defaults.
+- **No inline style attributes**: Do NOT use `style=""` on elements. All visual styling comes from the CSS modules.
 
 ### Critical: Section Glow
 
@@ -177,13 +186,14 @@ h2.section-glow, h3.section-glow { color: var(--accent-hover); }
 
 ### Critical: CJK Typographic Overrides
 
-When the output language is CJK (Chinese, Japanese, Korean), you MUST override:
+When the output language is CJK (Chinese, Japanese, Korean), you MUST append an override block AFTER all CSS modules. Do NOT modify the original values:
 
 ```css
-/* In typography.css, after copying, override for CJK output: */
+/* ===== CJK Overrides ===== */
 body { line-height: 1.8; }
-h1 { letter-spacing: 0.02em; }  /* NOT negative — CJK needs positive spacing */
+h1 { letter-spacing: 0.02em; }
 h2 { letter-spacing: 0.02em; }
+h3 { letter-spacing: 0; }
 ```
 
 CJK fonts are already in tokens.css defaults. Latin scripts override with Playfair Display + Inter.
@@ -224,6 +234,8 @@ Components:
 - NEVER add language switch/link elements unless the user explicitly asks.
 - NEVER add header bars, top navigation bars, or floating action buttons.
 - NEVER add breadcrumb navigation, progress bars, search boxes, or any element not defined in assets/.
+- NEVER add custom CSS classes not defined in the asset files or the html-map specific CSS (§6). No `.tag`, `.flow-arrow`, `.arch-svg`, or similar inventions.
+- NEVER use inline `style=""` attributes.
 - Theme toggle MUST be bottom-right (bottom: 2rem, right: 2rem). NEVER top-right.
 
 Layout:
@@ -232,9 +244,19 @@ Layout:
 - The project name and badges go INSIDE the main content area, not in a separate header bar.
 
 Typography enforcement:
-- CJK output MUST use: `letter-spacing: +0.02em` for h1/h2, `line-height: 1.8` for body.
+- CJK output MUST use: `letter-spacing: 0.02em` for h1/h2, `letter-spacing: 0` for h3, `line-height: 1.8` for body.
 - NEVER use negative letter-spacing for CJK content.
 
 Section glow:
 - MUST use `::before` pseudo-element with scaleY animation (from interactive.css).
 - NEVER use box-shadow glow or @keyframes animation.
+
+Verification (before outputting):
+- [ ] All CSS copied from assets/ files (no custom CSS classes)?
+- [ ] Sidebar first link has `class="active"`?
+- [ ] CJK overrides in appended block (NOT modified original values)?
+- [ ] No custom CSS classes or inline styles?
+- [ ] CSS modules have section comments (not compressed)?
+- [ ] Google Fonts link included?
+- [ ] Theme toggle: SVG icons, bottom-right?
+- [ ] Print + reduced-motion styles included?
