@@ -1,0 +1,65 @@
+[
+  {
+    "source": "shared/assets/tokens.css",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/tokens.css" },
+      { "skill": "skills/html-map", "path": "assets/tokens.css" }
+    ]
+  },
+  {
+    "source": "shared/assets/layout.css",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/layout.css" },
+      { "skill": "skills/html-map", "path": "assets/layout.css" }
+    ]
+  },
+  {
+    "source": "shared/assets/typography.css",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/typography.css" },
+      { "skill": "skills/html-map", "path": "assets/typography.css" }
+    ]
+  },
+  {
+    "source": "shared/assets/components.css",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/components.css" },
+      { "skill": "skills/html-map", "path": "assets/components.css" }
+    ]
+  },
+  {
+    "source": "shared/assets/interactive.css",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/interactive.css" },
+      { "skill": "skills/html-map", "path": "assets/interactive.css" }
+    ]
+  },
+  {
+    "source": "shared/assets/interactive.js",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/interactive.js" },
+      { "skill": "skills/html-map", "path": "assets/interactive.js" }
+    ]
+  },
+  {
+    "source": "shared/assets/sidebar.html",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/sidebar.html" },
+      { "skill": "skills/html-map", "path": "assets/sidebar.html" }
+    ]
+  },
+  {
+    "source": "shared/assets/theme-toggle.html",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/theme-toggle.html" },
+      { "skill": "skills/html-map", "path": "assets/theme-toggle.html" }
+    ]
+  },
+  {
+    "source": "shared/assets/google-fonts.html",
+    "targets": [
+      { "skill": "skills/html", "path": "assets/google-fonts.html" },
+      { "skill": "skills/html-map", "path": "assets/google-fonts.html" }
+    ]
+  }
+]
