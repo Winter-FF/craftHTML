@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.1] - 2026-05-17
+## [1.0.5] - 2026-05-24
+
+### Architecture
+
+- **Prose elements**: added `shared/assets/prose.css` for basic document elements (blockquote, hr, img, mark)
+- **Assembly discipline**: added strict rules in both SKILL.md files — keep module comments, CJK overrides as appended block, sidebar first link active, no custom CSS classes, no inline styles
+- **Verification expansion**: html verification checklist expanded to 17 items, html-map checklist added 8 items
+- **CJK precision**: fixed h3 letter-spacing override (0 instead of -0.005em), unified all letter-spacing values to `0.02em` (removed `+` prefix for consistency)
+
+## [1.0.4] - 2026-05-17
 
 ### Architecture
 
@@ -12,6 +21,34 @@ All notable changes to this project will be documented in this file.
 - **Registry**: added `shared/shared-registry.json` for source-to-target mappings
 - **Pre-commit hook**: automated sync validation before each commit
 - **SOURCE-OF-TRUTH markers**: line-1 comments in synced files preventing direct editing
+
+### Documentation
+
+- **CONTRIBUTING.md**: added Asset Synchronization section with workflow guidance
+- **CHANGELOG.md**: added v1.0.1 release notes
+
+## [1.0.3] - 2026-05-15
+
+### Architecture
+
+- **Output constraints**: strengthened rules against inventing components, clarified allowed HTML elements
+- **Verification checklist**: expanded from 12 to 13 items, added sidebar-first-link-active check
+- **CJK typographic enforcement**: clarified h3 letter-spacing override rule
+
+## [1.0.2] - 2026-05-15
+
+### Architecture
+
+- **agentskills.io standard**: restructured to `skills/*/SKILL.md` + `assets/` format (moved from `skills/*.md`)
+- **Asset extraction**: extracted all CSS/JS/HTML modules from inline to `assets/` directory (9 files per skill)
+- **Installer update**: moved `install.sh` to `scripts/` directory, updated to download from new structure
+
+## [1.0.1] - 2026-05-15
+
+### Architecture
+
+- **Verification checklist**: enhanced both SKILL.md files with clearer verification steps
+- **html-map improvements**: added 6-level understanding structure, clarified output sections
 
 ## [1.0.0] - 2026-05-13
 

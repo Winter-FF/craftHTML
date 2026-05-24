@@ -1,6 +1,8 @@
 ---
 name: html-map
 description: "Scan a codebase and generate a single-page visual map — from 'what is this?' to 'how do I modify it?' Includes architecture, data flow, key files, dependencies, git activity, reading path."
+metadata:
+  version: "1.0.5"
 ---
 
 # /html-map — Project Visual Map

@@ -1,6 +1,8 @@
 ---
 name: html
 description: "Transform any document into a publication-quality HTML page. Auto-detects document type and language. Supports generate, translate (--lang), and adjust modes."
+metadata:
+  version: "1.0.5"
 ---
 
 # /html — Document to Publication-Quality HTML
