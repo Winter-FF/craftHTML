@@ -24,6 +24,7 @@ test-output/
 # workflow
 .planning/
 .playwright-mcp
+.zcf
 
 # Temporary
 *.tmp
