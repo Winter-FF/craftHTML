@@ -26,4 +26,6 @@ ul, ol { margin-bottom: var(--space-4); padding-left: 1.5rem; }
 li { margin-bottom: var(--space-1); }
 li::marker { color: var(--text-muted); }
 
+small { font-size: 0.875rem; color: var(--text-muted); }
+
 .section-anchor { scroll-margin-top: 2rem; }
