@@ -133,11 +133,15 @@ Every document deserves to be presented with care.
 
 ```
 craftHTML/
+├── shared/
+│   └── assets/              ← Design system source of truth (10 files)
 ├── skills/
 │   ├── html/                ← /html skill (SKILL.md + assets/)
 │   └── html-map/            ← /html-map skill (SKILL.md + assets/)
 ├── scripts/
-│   └── install.sh           ← Fallback installer
+│   ├── install.sh           ← Fallback installer
+│   └── sync-shared.mjs      ← Sync script (shared/ → skills/)
+├── shared-registry.json     ← Source-to-target mappings
 ├── README.md
 ├── README.zh.md
 ├── CHANGELOG.md
