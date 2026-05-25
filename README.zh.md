@@ -133,11 +133,15 @@ curl -sSL https://raw.githubusercontent.com/Winter-FF/craftHTML/main/scripts/ins
 
 ```
 craftHTML/
+├── shared/
+│   └── assets/              ← 设计系统源文件（10 个文件）
 ├── skills/
 │   ├── html/                ← /html 技能（SKILL.md + assets/）
 │   └── html-map/            ← /html-map 技能（SKILL.md + assets/）
 ├── scripts/
-│   └── install.sh           ← 备选安装脚本
+│   ├── install.sh           ← 备选安装脚本
+│   └── sync-shared.mjs      ← 同步脚本（shared/ → skills/）
+├── shared-registry.json     ← 源文件到目标的映射
 ├── README.md
 ├── README.zh.md             ← 本文件
 ├── CHANGELOG.md

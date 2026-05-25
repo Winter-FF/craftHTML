@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.7] - 2026-05-25
+
+### Architecture
+
+- **Semantic elements**: added `small` element default styling in typography.css (font-size: 0.875rem, color: var(--text-muted))
+- **Component variants**: added `.card-compact` variant in components.css (padding: var(--space-4))
+- **Component spacing**: added default margin-top for `.key-file p` (0.5rem) and `.reading-step p` (0.25rem) in map-components.css
+- **HTML structure**: clarified in SKILL.md Assembly procedure — sidebar MUST be inside `.layout`, theme toggle MUST be outside
+- **Markdown images**: added handling rules — preserve all src URLs, use `<figure>` with `<figcaption>`
+
+### Documentation
+
+- **README.md / README.zh.md**: updated project structure to include `shared/` directory and `scripts/sync-shared.mjs`
+- **CONTRIBUTING.md**: added semantic elements, component variants, and component spacing to file descriptions
+
 ## [1.0.6] - 2026-05-25
 
 ### Architecture
