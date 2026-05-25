@@ -157,13 +157,14 @@ The /html-map output must look identical to /html output. Read these files and c
 5. `skills/html/assets/components.css` — cards, badges, tables, metrics, collapsible
 6. `skills/html/assets/interactive.css` — section glow, copy button, theme toggle, print, responsive
 7. `skills/html/assets/interactive.js` — ALL JavaScript (theme, sidebar, glow, copy)
+8. `skills/html-map/assets/map-components.css` — directory tree, data flow, key files, git bars, reading path
 
 ### Assembly Discipline
 
 - **Keep module comments**: Each CSS module has a `/* ===== Name ===== */` header. Preserve them in the `<style>` tag — do NOT compress or minify CSS.
 - **CJK overrides as appended block**: When output is CJK, add overrides AFTER all CSS modules in a clearly marked `/* ===== CJK Overrides ===== */` block. Do NOT modify the original values inside the module copies.
 - **Sidebar first link active**: The first `<a>` in the sidebar MUST have `class="active"`.
-- **No custom CSS classes**: Do NOT add CSS classes not defined in the asset files or the html-map specific CSS below. For html-map output, the ONLY custom classes allowed are: `.tree`, `.flow-diagram`, `.flow-step`, `.key-file`, `.key-file-path`, `.git-bars`, `.git-bar`, `.reading-step`, `.reading-num`. Everything else uses browser defaults.
+- **No custom CSS classes**: Do NOT add CSS classes not defined in the asset files or `map-components.css`. For html-map output, the ONLY additional classes allowed are those in `map-components.css` (`.tree`, `.flow-diagram`, `.flow-step`, `.key-file`, `.key-file-path`, `.git-bars`, `.git-bar`, `.reading-step`, `.reading-num`). Everything else uses browser defaults.
 - **No inline style attributes**: Do NOT use `style=""` on elements. All visual styling comes from the CSS modules.
 
 ### Critical: Section Glow
@@ -200,31 +201,11 @@ h3 { letter-spacing: 0; }
 
 CJK fonts are already in tokens.css defaults. Latin scripts override with Playfair Display + Inter.
 
-### html-map Specific CSS (add these after html components)
+### html-map Specific CSS
 
-```css
-/* Directory tree */
-.tree { font-family: var(--font-mono); font-size: .8125rem; line-height: 1.8; }
-.tree details { border: none; background: none; box-shadow: none; margin: 0; }
-.tree summary { padding: 0; font-weight: 400; gap: .5rem; }
-.tree .indent { padding-left: 1.5rem; }
+8. `skills/html-map/assets/map-components.css` — directory tree, data flow, key files, git bars, reading path
 
-/* Data flow */
-.flow-diagram { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: center; }
-.flow-step { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); text-align: center; box-shadow: var(--shadow-sm); }
-
-/* Key files cards */
-.key-file { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); box-shadow: var(--shadow-sm); }
-.key-file-path { font-family: var(--font-mono); font-size: .8125rem; color: var(--accent); font-weight: 500; }
-
-/* Git activity bars */
-.git-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
-.git-bar { flex: 1; min-width: 4px; background: var(--accent-subtle); border-radius: 2px 2px 0 0; }
-
-/* Reading path */
-.reading-step { display: flex; align-items: flex-start; gap: var(--space-3); padding: .625rem 0; border-bottom: 1px solid var(--border-subtle); }
-.reading-num { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-subtle); color: var(--accent); font-size: .75rem; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-```
+Add this file after all shared components. These are the ONLY additional classes allowed beyond shared assets/.
 
 ---
 
