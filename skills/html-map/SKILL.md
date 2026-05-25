@@ -167,6 +167,7 @@ The /html-map output must look identical to /html output. Read these files and c
 - **No custom CSS classes**: Do NOT add CSS classes not defined in the asset files or `map-components.css`. For html-map output, the ONLY additional classes allowed are those in `map-components.css` (`.tree`, `.flow-diagram`, `.flow-step`, `.flow-arrow`, `.key-file`, `.key-file-path`, `.git-bars`, `.git-bar`, `.reading-step`, `.reading-num`). Everything else uses browser defaults.
 - **No inline style attributes**: Do NOT use `style=""` on elements. All visual styling comes from the CSS modules.
 - **Spacing without utility classes**: Do NOT invent margin/padding utility classes. Use the natural spacing of existing components. If you need extra space between elements, use `<hr>` or an empty `<p>` with existing prose styles.
+- **Use `<small>` for auxiliary text**: For small labels, metadata, or descriptions inside flow-step/key-file/reading-step, use `<small>` element (NOT `<div style="font-size: ...">`). The `small` element already has default styling in typography.css.
 
 ### Critical: Section Glow
 
