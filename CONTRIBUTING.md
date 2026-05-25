@@ -40,15 +40,14 @@ If you modify shared design system assets (`shared/assets/*.css`, `*.js`, `*.htm
 - tokens.css (colors, shadows, fonts, spacing, motion)
 - layout.css (sidebar + main layout)
 - typography.css (headings, body, code styles)
+- prose.css (blockquote, hr, img, mark)
 - components.css (cards, badges, tables, metrics, collapsible)
 - interactive.css (theme toggle, copy button, section glow, print)
 - interactive.js (theme toggle logic, sidebar tracking, glow animation, copy buttons)
 - sidebar.html (sidebar template)
 - theme-toggle.html (theme toggle button)
 - google-fonts.html (font links for CJK/Latin/mixed)
-
-**Not synced**:
-- `skills/html-map/assets/map-components.css` — html-map specific components (directory tree, flow diagram, git bars, reading path)
+- map-components.css (directory tree, flow diagram, key files, git bars, reading path — html-map only)
 
 ## License
 

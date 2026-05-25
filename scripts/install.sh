@@ -33,6 +33,8 @@ MODULES=(
   "interactive.css" "interactive.js"
   "sidebar.html" "theme-toggle.html" "google-fonts.html"
 )
+declare -A EXTRA_MODULES
+EXTRA_MODULES[html-map]="map-components.css"
 
 # ─── Helpers ───
 
@@ -101,6 +103,20 @@ do_install() {
         ((errors++))
       fi
     done
+
+    # Extra modules per skill
+    if [ -n "${EXTRA_MODULES[$skill]}" ]; then
+      for m in ${EXTRA_MODULES[$skill]}; do
+        if download "$BASE_URL/skills/$skill/assets/$m" "$target/$skill/assets/$m"; then
+          ok "$skill/assets/$m"
+          ((total++))
+          size=$((size + $(file_size "$target/$skill/assets/$m" || echo 0)))
+        else
+          fail "$skill/assets/$m"
+          ((errors++))
+        fi
+      done
+    fi
   done
 
   echo ""
