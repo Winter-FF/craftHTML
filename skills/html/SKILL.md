@@ -69,8 +69,9 @@ CJK scripts use the defaults from tokens.css.
 - **Keep module comments**: Each CSS module has a `/* ===== Name ===== */` header. Preserve them in the `<style>` tag — do NOT compress or minify CSS.
 - **CJK overrides as appended block**: When output is CJK, add overrides AFTER all CSS modules in a clearly marked `/* ===== CJK Overrides ===== */` block. Do NOT modify the original values inside the module copies.
 - **Sidebar first link active**: The first `<a>` in the sidebar MUST have `class="active"`.
-- **No custom CSS classes**: Do NOT add CSS classes not defined in `assets/`. If a standard HTML element needs styling (blockquote, hr, img, mark), it is in `prose.css`. Everything else uses browser defaults.
+- **No custom CSS classes**: Do NOT add CSS classes not defined in `assets/`. If a standard HTML element needs styling (blockquote, hr, img, mark, figure, figcaption), it is in `prose.css`. Everything else uses browser defaults.
 - **No inline style attributes**: Do NOT use `style=""` on elements. All visual styling comes from the CSS modules.
+- **Spacing without utility classes**: Do NOT invent margin/padding utility classes. Use the natural spacing of existing components (cards have built-in padding, sections have margins from heading rules, blockquote/hr have defined margins). If you need extra space between elements, use `<hr>` or an empty `<p>` with existing prose styles.
 
 ---
 
@@ -92,6 +93,20 @@ Key rules:
 - Sidebar generation: slug-based IDs, first item active, truncate labels > 30 chars
 - Supplementary tables → wrap in card. Core tables → standalone
 - Simple data flows → CSS flexbox step boxes. Complex → inline SVG
+
+### Summary Card Design
+
+- Summary card (card-accent at top) should be concise: 1-2 paragraphs max.
+- Do NOT nest blockquotes inside summary cards — keep blockquotes standalone.
+- Badges (version, license, tech stack) can appear in summary card, but limit to 3-4 items.
+- The summary card's purpose is to orient the reader, not to contain all introductory content.
+
+### Markdown Image Handling
+
+- Convert Markdown `![alt](src)` to `<img src="..." alt="...">`.
+- Wrap significant images in `<figure>` with `<figcaption>` for captions.
+- Always preserve the original `src` URL, even for external images (e.g., star-history charts, shields.io badges).
+- `prose.css` provides styling for `img`, `figure`, and `figcaption`.
 
 ---
 
@@ -192,3 +207,5 @@ Before outputting, verify:
 - [ ] Google Fonts link matches output script?
 - [ ] `<html lang="xx">` correct?
 - [ ] Print + reduced-motion styles included?
+- [ ] All Markdown images preserved (src URLs intact)?
+- [ ] Summary card concise (no nested blockquotes)?
