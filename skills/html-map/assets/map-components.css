@@ -9,6 +9,7 @@
 /* Data flow */
 .flow-diagram { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; justify-content: center; }
 .flow-step { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); text-align: center; box-shadow: var(--shadow-sm); }
+.flow-arrow { font-size: 1.25rem; color: var(--text-muted); }
 
 /* Key files cards */
 .key-file { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-4); box-shadow: var(--shadow-sm); }

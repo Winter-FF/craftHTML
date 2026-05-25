@@ -17,3 +17,8 @@ img { max-width: 100%; height: auto; border-radius: var(--radius-md); }
 
 /* Mark / Highlight */
 mark { background: var(--accent-subtle); color: var(--accent); padding: 0.1em 0.3em; border-radius: 2px; }
+
+/* Figure / Image Caption */
+figure { margin: var(--space-8) 0; }
+figure img { display: block; margin: 0 auto; }
+figcaption { margin-top: var(--space-2); font-size: 0.875rem; color: var(--text-muted); text-align: center; }
