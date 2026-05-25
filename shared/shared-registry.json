@@ -68,5 +68,11 @@
       { "skill": "skills/html", "path": "assets/prose.css" },
       { "skill": "skills/html-map", "path": "assets/prose.css" }
     ]
+  },
+  {
+    "source": "shared/assets/map-components.css",
+    "targets": [
+      { "skill": "skills/html-map", "path": "assets/map-components.css" }
+    ]
   }
 ]
