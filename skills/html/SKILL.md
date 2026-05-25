@@ -47,10 +47,20 @@ assets/
 Assembly procedure:
 1. Create `<!DOCTYPE html>` with `<html lang="xx">` (detect language from content)
 2. In `<head>`: Google Fonts link + all CSS modules combined in `<style>` tag
-3. In `<body>`: sidebar.html template + main content + theme-toggle.html template
-4. Before `</body>`: interactive.js in a `<script>` tag
-5. If CJK output: append a `/* CJK Overrides */` block after all CSS modules (see §3)
-6. Verify against the checklist below
+3. In `<body>`: use this exact HTML structure:
+   ```html
+   <body>
+     <div class="layout">
+       <nav class="sidebar"><!-- from sidebar.html --></nav>
+       <main class="main"><!-- all content here --></main>
+     </div>
+     <!-- from theme-toggle.html -->
+     <script><!-- from interactive.js --></script>
+   </body>
+   ```
+   The sidebar MUST be inside `.layout`, as a sibling of `.main`. The theme toggle MUST be outside `.layout`.
+4. If CJK output: append a `/* CJK Overrides */` block after all CSS modules (see §3)
+5. Verify against the checklist below
 
 Google Fonts — copy the link matching your script:
 - CJK: `Noto+Serif+SC:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Inter`
