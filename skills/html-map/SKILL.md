@@ -164,8 +164,9 @@ The /html-map output must look identical to /html output. Read these files and c
 - **Keep module comments**: Each CSS module has a `/* ===== Name ===== */` header. Preserve them in the `<style>` tag — do NOT compress or minify CSS.
 - **CJK overrides as appended block**: When output is CJK, add overrides AFTER all CSS modules in a clearly marked `/* ===== CJK Overrides ===== */` block. Do NOT modify the original values inside the module copies.
 - **Sidebar first link active**: The first `<a>` in the sidebar MUST have `class="active"`.
-- **No custom CSS classes**: Do NOT add CSS classes not defined in the asset files or `map-components.css`. For html-map output, the ONLY additional classes allowed are those in `map-components.css` (`.tree`, `.flow-diagram`, `.flow-step`, `.key-file`, `.key-file-path`, `.git-bars`, `.git-bar`, `.reading-step`, `.reading-num`). Everything else uses browser defaults.
+- **No custom CSS classes**: Do NOT add CSS classes not defined in the asset files or `map-components.css`. For html-map output, the ONLY additional classes allowed are those in `map-components.css` (`.tree`, `.flow-diagram`, `.flow-step`, `.flow-arrow`, `.key-file`, `.key-file-path`, `.git-bars`, `.git-bar`, `.reading-step`, `.reading-num`). Everything else uses browser defaults.
 - **No inline style attributes**: Do NOT use `style=""` on elements. All visual styling comes from the CSS modules.
+- **Spacing without utility classes**: Do NOT invent margin/padding utility classes. Use the natural spacing of existing components. If you need extra space between elements, use `<hr>` or an empty `<p>` with existing prose styles.
 
 ### Critical: Section Glow
 
@@ -243,3 +244,5 @@ Verification (before outputting):
 - [ ] Google Fonts link included?
 - [ ] Theme toggle: SVG icons, bottom-right?
 - [ ] Print + reduced-motion styles included?
+- [ ] All external images/charts preserved (src URLs intact)?
+- [ ] Summary card concise (no nested blockquotes)?
