@@ -9,6 +9,7 @@
 .card { background: var(--bg-card-solid); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 1.75rem 2rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-sm); transition: box-shadow var(--duration-normal) var(--ease-out); }
 .card:hover { box-shadow: var(--shadow-md); }
 .card-accent { border-left: 3px solid var(--accent); }
+.card-compact { padding: var(--space-4); }
 .card h3, .card h4 { margin-top: 0; margin-bottom: 0.75rem; }
 
 /* Badges */
