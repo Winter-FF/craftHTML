@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.6] - 2026-05-25
+
+### Architecture
+
+- **Map components unified**: moved `skills/html-map/assets/map-components.css` into `shared/assets/`, eliminating the inconsistency between inline CSS code blocks and file-based components
+- **SKILL.md simplification**: replaced html-map inline CSS code block with file reference to `assets/map-components.css`, reducing cognitive load for AI agents
+- **Installer enhancement**: added per-skill extra modules support via `EXTRA_MODULES` associative array
+
 ## [1.0.5] - 2026-05-24
 
 ### Architecture
